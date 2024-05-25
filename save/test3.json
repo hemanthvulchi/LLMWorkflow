@@ -1,0 +1,96 @@
+{
+    "nodes": [
+        {
+            "type": "Input2_Node",
+            "x": 4620,
+            "y": 5165,
+            "uuid": "a548e245-bf13-4125-b052-4fbe697d1c1a"
+        },
+        {
+            "type": "Input2_Node",
+            "x": 4306,
+            "y": 4945,
+            "uuid": "1490886a-e5a1-43cd-bcd6-72e8c6960534"
+        },
+        {
+            "type": "Input2_Node",
+            "x": 4184,
+            "y": 4717,
+            "uuid": "1e0d3670-dabd-4c9a-b570-57e37091aa32"
+        },
+        {
+            "type": "Add_Node",
+            "x": 5450,
+            "y": 4820,
+            "uuid": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4946,
+            "y": 4916,
+            "uuid": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b"
+        },
+        {
+            "type": "Print_Node",
+            "x": 5752,
+            "y": 4760,
+            "uuid": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4"
+        },
+        {
+            "type": "Scaler_Node",
+            "x": 4733,
+            "y": 5522,
+            "uuid": "fb254b28-ef69-4fc1-8619-ed4fd0581690"
+        },
+        {
+            "type": "Input_Node",
+            "x": 5118,
+            "y": 5192,
+            "uuid": "f2a5bca4-fffe-4682-8bcb-516acda74c0f"
+        }
+    ],
+    "connections": [
+        {
+            "start_id": "a548e245-bf13-4125-b052-4fbe697d1c1a",
+            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "start_pin": "value",
+            "end_pin": "input B"
+        },
+        {
+            "start_id": "1e0d3670-dabd-4c9a-b570-57e37091aa32",
+            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "start_pin": "value",
+            "end_pin": "input A"
+        },
+        {
+            "start_id": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d",
+            "end_id": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4",
+            "start_pin": "output",
+            "end_pin": "input"
+        },
+        {
+            "start_id": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d",
+            "end_id": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4",
+            "start_pin": "Ex Out",
+            "end_pin": "Ex In"
+        },
+        {
+            "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "end_id": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d",
+            "start_pin": "Ex Out",
+            "end_pin": "Ex In"
+        },
+        {
+            "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "end_id": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d",
+            "start_pin": "output",
+            "end_pin": "input A"
+        },
+        {
+            "start_id": "f2a5bca4-fffe-4682-8bcb-516acda74c0f",
+            "end_id": "0ae3787b-79d5-4a34-906b-1a5f3d110b2d",
+            "start_pin": "value",
+            "end_pin": "input B"
+        }
+    ]
+}

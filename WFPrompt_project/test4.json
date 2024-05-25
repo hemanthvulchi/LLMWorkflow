@@ -1,0 +1,120 @@
+{
+    "nodes": [
+        {
+            "type": "Print_Node",
+            "x": 5825,
+            "y": 4727,
+            "uuid": "f3222cc5-8516-4eb1-9edf-610c2629133a"
+        },
+        {
+            "type": "ExcelAdvancedProcess_Node",
+            "x": 6041,
+            "y": 4790,
+            "uuid": "dfb99a93-246f-4d0f-b2c0-7c3de9e19382"
+        },
+        {
+            "type": "ExcelBasicProcess_Node",
+            "x": 5578,
+            "y": 4784,
+            "uuid": "afc40bdb-de3f-4127-940d-91fa34aac980"
+        },
+        {
+            "type": "Combine_Node",
+            "x": 5256,
+            "y": 4819,
+            "uuid": "03d41bf3-398a-4b3f-b003-21fb8498cd35"
+        },
+        {
+            "type": "Print_Node",
+            "x": 5810,
+            "y": 5277,
+            "uuid": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4"
+        },
+        {
+            "type": "SimpleInput_Node",
+            "x": 4919,
+            "y": 5298,
+            "uuid": "4225a225-5df3-4653-958c-a2f70033ebaa"
+        },
+        {
+            "type": "Input_Node",
+            "x": 4536,
+            "y": 4765,
+            "uuid": "0d149d29-9cf3-4a54-8e71-93f5e7b968ee"
+        },
+        {
+            "type": "Input_Node",
+            "x": 4534,
+            "y": 5068,
+            "uuid": "75f1ac90-f280-40de-a32f-16f2e4557534"
+        },
+        {
+            "type": "Aggregate_Node",
+            "x": 4907,
+            "y": 4863,
+            "uuid": "49c76dfe-6fd1-4086-a31d-f13f2bf4a18c"
+        },
+        {
+            "type": "PwrPointProcessor_Node",
+            "x": 5580,
+            "y": 5123,
+            "uuid": "09934e4e-a07b-4318-9d3b-f6fc2defc058"
+        },
+        {
+            "type": "PwrPointAdvancedProcessor_Node",
+            "x": 6033,
+            "y": 5070,
+            "uuid": "41de2473-6741-477b-a539-5e4f8619e87f"
+        }
+    ],
+    "connections": [
+        {
+            "start_id": "afc40bdb-de3f-4127-940d-91fa34aac980",
+            "end_id": "f3222cc5-8516-4eb1-9edf-610c2629133a",
+            "start_pin": "value",
+            "end_pin": "input"
+        },
+        {
+            "start_id": "09934e4e-a07b-4318-9d3b-f6fc2defc058",
+            "end_id": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4",
+            "start_pin": "value",
+            "end_pin": "input"
+        },
+        {
+            "start_id": "75f1ac90-f280-40de-a32f-16f2e4557534",
+            "end_id": "49c76dfe-6fd1-4086-a31d-f13f2bf4a18c",
+            "start_pin": "value",
+            "end_pin": "input B"
+        },
+        {
+            "start_id": "03d41bf3-398a-4b3f-b003-21fb8498cd35",
+            "end_id": "09934e4e-a07b-4318-9d3b-f6fc2defc058",
+            "start_pin": "output B",
+            "end_pin": "input A"
+        },
+        {
+            "start_id": "49c76dfe-6fd1-4086-a31d-f13f2bf4a18c",
+            "end_id": "03d41bf3-398a-4b3f-b003-21fb8498cd35",
+            "start_pin": "output",
+            "end_pin": "input A"
+        },
+        {
+            "start_id": "0d149d29-9cf3-4a54-8e71-93f5e7b968ee",
+            "end_id": "49c76dfe-6fd1-4086-a31d-f13f2bf4a18c",
+            "start_pin": "value",
+            "end_pin": "input A"
+        },
+        {
+            "start_id": "4225a225-5df3-4653-958c-a2f70033ebaa",
+            "end_id": "03d41bf3-398a-4b3f-b003-21fb8498cd35",
+            "start_pin": "value",
+            "end_pin": "input B"
+        },
+        {
+            "start_id": "03d41bf3-398a-4b3f-b003-21fb8498cd35",
+            "end_id": "afc40bdb-de3f-4127-940d-91fa34aac980",
+            "start_pin": "output A",
+            "end_pin": "input A"
+        }
+    ]
+}

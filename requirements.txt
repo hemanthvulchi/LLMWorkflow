@@ -1,0 +1,6 @@
+pyqtdarktheme
+PySide6
+Pandas
+Openpyxl
+win32com
+pptx
