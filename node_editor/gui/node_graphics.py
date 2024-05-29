@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
-
+from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPainter, QBrush,QPen
 from node_editor.common import Node_Status
 
 
@@ -51,6 +51,17 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         self.title_color = QtGui.QColor(title_color[0], title_color[1], title_color[2])
         self.node_color = QtGui.QColor(background_color[0], background_color[1], background_color[2])
 
+    def draw_glow(self, painter, path, color, blur_radius=12):
+        """Draws a glow effect around the given path."""
+        for i in range(blur_radius, 10, -1):
+            alpha = 255 - (i / blur_radius) * 255
+            glow_color = QtGui.QColor(color)
+            glow_color.setAlpha(alpha)
+            glow_pen = QtGui.QPen(glow_color, i, Qt.SolidLine)
+            painter.setPen(glow_pen)
+            painter.setBrush(Qt.NoBrush)
+            painter.drawPath(path)
+
     def paint(self, painter, option=None, widget=None):
         """
         Paints the node on the given painter.
@@ -64,7 +75,8 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         painter.setPen(self.node_color.lighter())
         painter.setBrush(self.node_color)
         painter.drawPath(self.path)
-
+        glow_color = self.get_status_color()
+        #self.draw_glow(painter, self.path, glow_color)
         gradient = QtGui.QLinearGradient()
         gradient.setStart(0, -90)
         gradient.setFinalStop(0, 0)
@@ -166,7 +178,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         # Draw the status rectangle
         self.status_path.setFillRule(Qt.WindingFill)
-        self.status_path.addRoundedRect(total_width / 2 - 12, -total_height / 2 + 2, 10, 10, 2, 2)
+        self.status_path.addRoundedRect(total_width / 2 - 30, -total_height / 2 + 2, 25, 10, 2, 2)
         # self.status_path.addRect(total_width / 2 - 10, -total_height / 2, 5, 5)
         # self.status_path.addRect(total_width / 2 - 10, -total_height / 2 + 15, 5, 5)
         # self.status_path.addRect(total_width / 2 - 5, -total_height / 2 + 15, 5, 5)

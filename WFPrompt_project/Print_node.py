@@ -10,7 +10,7 @@ class Print_Node(Node):
 
         self.title_text = "Print"
         self.type_text = "Debug Nodes"
-        self.set_color(title_color=(160, 32, 240))
+        self.set_color(title_color=(3, 87, 254))
 
         self.add_pin(name="Ex In", is_output=False, execution=True)
 

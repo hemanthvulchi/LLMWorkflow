@@ -2,8 +2,8 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton
 from PySide6.QtCore import Qt
 from node_editor.node import Node
-from node_editor.openaiconnection import OpenAIConnection
 from node_editor.configdialog import ConfigDialog
+from node_editor.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
 
@@ -14,7 +14,7 @@ class Aggregate_Node(Node):
 
         self.title_text = "GenAI Aggregate"
         self.type_text = "Data to be entered"
-        self.set_color(title_color=(255, 165, 0))
+        self.set_color(title_color=(44, 110, 96))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
 
@@ -24,18 +24,15 @@ class Aggregate_Node(Node):
         #self.pin_B_end = Pin(None,None)
         self.pin_output = self.add_pin(name="output", is_output=True)
         self.build()
-        self.con = OpenAIConnection()
-        self.openAIclient = self.con.get_connection()
 
         self.config = {
             "user_prompt": "please write a detailed report on the below material",
             "system_prompt": "You are a security risk professional",
             "output":"",
-            "max_tokens": 64,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
-            "usage_tokens": "",
+            "temperature": "",
             "input1":"",
             "input2":""
         }
@@ -96,10 +93,10 @@ class Aggregate_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
-
         super().init_widget()
 
     def show_configuration(self):
+        self.btn_refresh()
         self.config["user_prompt"] = self.textbox.toPlainText()
         strtemp = str(self.pin_A.connected_pin.get_data())
         strtemp = strtemp + "\n" + str(self.pin_B.connected_pin.get_data())
@@ -111,6 +108,7 @@ class Aggregate_Node(Node):
             self.responsetext.setText(self.config["output"])
             self.textbox.setText(self.config["user_prompt"])
             self.pin_output.set_data(self.responsetext.toPlainText())
+            self.status = Node_Status.CLEAN
         print("Pin output data:", self.pin_output.get_data())        
 
     def btn_refresh(self):
@@ -135,9 +133,9 @@ class Aggregate_Node(Node):
         # Join the text with newline characters
         joined_text = f"{text3}\n{text1}\n{text2}"        
         connection = LLMConnection()
-        response = connection.call_prompt(joined_text,self.config["system_prompt"],self.config["model"])
-        self.responsetext.setText(response.choices[0].message.content)
-        self.pin_output.set_data(self.responsetext.toPlainText())
+        response = connection.call_prompt(joined_text,self.config["system_prompt"])
+        self.responsetext.setText(str(response))
+        self.pin_output.set_data(str(response))
 
 class ExtendedConfigDialog(ConfigDialog):
     def __init__(self, config_json, openAIclient, parent=None):

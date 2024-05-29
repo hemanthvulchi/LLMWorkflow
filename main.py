@@ -20,6 +20,18 @@ import qdarktheme
 
 from node_editor.gui.node_list import NodeList
 from node_editor.gui.node_widget import NodeWidget
+from utils.display import Display
+from utils.datamodels import ModelSelection
+from node_editor.configdialog import ConfigDialog
+from utils.llmconnection import LLMConnection
+from utils.display import Display
+from pptx import Presentation
+from pptx.util import Inches
+import win32com.client
+import pandas as pd
+import openpyxl
+import pandas as pd
+from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -33,10 +45,8 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.project_path = None
         self.imports = None  # we will store the project import node types here for now.
 
-        icon = QtGui.QIcon("resources\\app.ico")
-        self.setWindowIcon(icon)
 
-        self.setWindowTitle("Simple Node Editor")
+        self.setWindowTitle("Visual Prompt Engineering")
         settings = QtCore.QSettings("node-editor", "NodeEditor")
 
         # create a "File" menu and add an "Export CSV" action to it
@@ -155,11 +165,17 @@ class NodeEditor(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     import qdarktheme
-    #from util.openaiconnection
-    app = QtWidgets.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon("resources\\app.ico"))
-    qdarktheme.setup_theme()
-    launcher = NodeEditor()
-    launcher.show()
-    app.exec()
+    import traceback
+    try:
+        app = QtWidgets.QApplication(sys.argv)
+        model_selection = ModelSelection()
+        model_selection.select_models()        
+        app.setWindowIcon(QtGui.QIcon("resources\\ai.jpg"))
+        qdarktheme.setup_theme()
+        launcher = NodeEditor()
+        launcher.show()
+        app.exec()
+    except Exception as e:
+        print("Error", f"Fatal failure!\nError: {str(e)}\n Detailed Description: {str(traceback.format_exc())}")
+        Display.show_error_box( "Error", f"Fatal failure!\nError: {str(e)}\n Detailed Description: {str(traceback.format_exc())}")
     sys.exit()

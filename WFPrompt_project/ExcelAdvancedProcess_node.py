@@ -2,9 +2,11 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from node_editor.node import Node
 from node_editor.configdialog import ConfigDialog
+from node_editor.common import Node_Status
 from openpyxl.utils import range_boundaries, get_column_letter
 from utils.display import Display
 from utils.llmconnection import LLMConnection
+from utils.datamodels import SelectedLLM
 import openpyxl
 import pandas as pd
 import json
@@ -17,7 +19,7 @@ class ExcelAdvancedProcess_Node(Node):
         super().__init__()
         self.title_text = "Excel Advanced Assistant"
         self.type_text = "Beta: Directly work in excel"
-        self.set_color(title_color=(190, 0, 0))
+        self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build()
@@ -27,11 +29,10 @@ class ExcelAdvancedProcess_Node(Node):
             "system_prompt": "You are a security risk professional",
             "output":"",
             "additional_input":"",
-            "max_tokens": 64,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
         # Create a single instance of the ExtendedConfigDialog
@@ -72,7 +73,7 @@ class ExcelAdvancedProcess_Node(Node):
         super().init_widget()
 
     def show_configuration(self):
-        #self.config['input1'] = 
+        self.btn_refresh()
         if self.pin_A:
             self.config['additional_input'] = str(self.pin_A.connected_pin.get_data())
             print("[Excel Process] added data:",self.config['additional_input'])
@@ -84,6 +85,8 @@ class ExcelAdvancedProcess_Node(Node):
             self.textbox.setText(self.dialog.complete_prompt.toPlainText())
             self.pin_output.set_data(self.responsetext.toPlainText())
         print("Pin output data:", self.pin_output.get_data())
+        if self.pin_output.get_data() != "":
+            self.status = Node_Status.CLEAN
 
     def btn_refresh(self):
         print("Refreshing data")
@@ -150,8 +153,6 @@ class ExtendedConfigDialog(ConfigDialog):
 
     def get_configuration(self):
         config = json.loads(super().get_configuration())
-        config["extra_field1"] = self.extra_field1.text()
-        config["extra_field2"] = self.extra_field2.text()
         return json.dumps(config)
 
     def excel_combobox_updated(index):
@@ -160,9 +161,11 @@ class ExtendedConfigDialog(ConfigDialog):
 
     def updatecompleteprompt(self):
             if self.excel_combobox.currentIndex() == 0:
-                tempString = self.user_prompt.toPlainText() + " [Excel Cell]" + self.post_prompt.toPlainText() + "\n" + self.additional_input
+                tempString = self.user_prompt.toPlainText() + " [Excel Cell]" + self.post_prompt.toPlainText() + "\n" + self.system_prompt.toPlainText()  \
+                    + "\n" +self.additional_input
             elif self.excel_combobox.currentIndex() == 1:
-                tempString = self.user_prompt.toPlainText() + "[Row Header] and [Column Header]" + self.post_prompt.toPlainText() + "\n" + self.additional_input        
+                tempString = self.user_prompt.toPlainText() + "[Row Header] and [Column Header]" + self.post_prompt.toPlainText() + "\n"  \
+                    + self.system_prompt.toPlainText() + "\n" + self.additional_input        
             else:
                 tempString = "NOT IMPLEMENTED"
             self.complete_prompt.setText(tempString)    
@@ -236,25 +239,34 @@ class ExtendedConfigDialog(ConfigDialog):
             Display.show_message_box("Error", "No file selected")
             return None
         try:
+            sLLM = SelectedLLM()
             workbook = openpyxl.load_workbook(self.selected_file)
             sheet = workbook[self.sheet_name]
             cell_range = self.range_input.text()
             cells = sheet[cell_range]
             connection = LLMConnection()
-            connection.initiate_assistant("Excel Iterator",self.system_prompt.toPlainText(),self.model.text())
+            self.selected_company = sLLM.selected_company
             inputText = ""
-            assistant_output = connection.call_assistant("Here is data for reference:\n\n" + self.additional_input, self.max_tokens_slider.value())            
+            if self.selected_company == "OpenAI GPTs":
+                connection.initiate_assistant("Excel Iterator",self.system_prompt.toPlainText())
+                assistant_output = connection.call_assistant("Here is data for reference:\n\n" + self.additional_input, self.max_tokens_slider.value())            
+            elif self.selected_company == "Google Gemini":
+                assistant_output = connection.call_prompt(self.system_prompt.toPlainText() +"\n" + self.additional_input, self.max_tokens_slider.value())
             inputText = ""
             self.outputText = ""
             self.rollingText = ""
             #for condition where we want to answer all non-empty cells
-            if self.excel_combobox.currentIndex == 0:
+            #self.excel_combobox.currentData
+            if self.excel_combobox.currentIndex() == 0:
                 print("Question mode")
                 for row in cells:
                     for cell in row:
                         if cell.value is not None:
                             inputText = self.user_prompt.toPlainText() + str(cell.value) + self.post_prompt.toPlainText()
-                            assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())
+                            if self.selected_company == "OpenAI GPTs":
+                                assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())            
+                            elif self.selected_company == "Google Gemini":
+                                assistant_output = connection.call_prompt(inputText, self.max_tokens_slider.value())                            
                             #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
                             self.outputText = assistant_output
                             print("---------------------------------------------------")
@@ -275,7 +287,10 @@ class ExtendedConfigDialog(ConfigDialog):
                             col_header = sheet.cell(row=start_row, column=cell.column).value                                               
                             inputText = self.user_prompt.toPlainText() + str(f"[{row_header}] and [{col_header}]") + \
                                         self.post_prompt.toPlainText() +  "\n" 
-                            assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())
+                            if self.selected_company == "OpenAI GPTs":
+                                assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())            
+                            elif self.selected_company == "Google Gemini":
+                                assistant_output = connection.call_prompt(inputText, self.max_tokens_slider.value())                            
                             #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
                             self.outputText = assistant_output
                             print("---------------------------------------------------")
@@ -283,58 +298,6 @@ class ExtendedConfigDialog(ConfigDialog):
                             self.rollingText = assistant_output + "\n" + self.rollingText
                             cell.value = assistant_output
                             self.responseAPItext.setText(self.rollingText)                                        
-            print("in config dialog")
-
-            Display.show_message_box("SuccessExtend", "API connection successful Extend!\nResponse: " + self.rollingText)
-            self.responseAPItext.setText(self.rollingText)
-            save_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Excel Files (*.xlsx)")
-            if not save_path:
-                Display.show_message_box("Error", "No save location selected!")
-                return
-            workbook.save(save_path)
-            Display.show_message_box("Success", f"File saved as {save_path}")
-        except Exception as e:
-            print("Error", f"API connection failed!\nError: {str(e)}")
-            print(traceback.format_exc())
-            Display.show_message_box("Error", f"API connection failed!\nError: {str(e)}")
-
-
-        
-    def test_api_connection1(self):
-        if self.selected_file == "":
-            Display.show_message_box("Error", "No file selected")
-            return None
-        try:
-            workbook = openpyxl.load_workbook(self.selected_file)
-            sheet = workbook[self.sheet_name]
-            cell_range = self.range_input.text()
-            cells = sheet[cell_range]
-            connection = LLMConnection()
-            #connection.initiate_assistant("Excel Iterator", self.system_prompt.toPlainText(),self.model.text())            
-            inputText = ""
-            self.outputText = ""
-            self.rollingText = ""
-            start_row = cells[0][0].row
-            start_col = cells[0][0].column
-            for row in cells:
-                row_number = row[0].row  # Get the row number (assuming first cell in row has it)
-                for cell in row:
-                    if cell.value is None:
-                        row_header = sheet.cell(row=row_number, column=start_col).value 
-                        col_header = sheet.cell(row=start_row, column=cell.column).value                                               
-                        inputText = self.user_prompt.toPlainText() + str(cell.value) + self.post_prompt.toPlainText() +  "\n" + self.additional_input
-                        #inputText = self.user_prompt.toPlainText() + \
-                        #    f"[{row_header}] {cell.value} [{col_header}]" + \
-                        #    self.post_prompt.toPlainText() +  "\n" + self.additional_input
-                        #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                        #self.outputText = response.choices[0].message.content
-                        #print("---------------------------------------------------")
-                        #print(self.outputText)
-                        #self.rollingText = self.outputText + "\n" + self.rollingText
-                        self.rollingText = str(f"[{row_header}] and [{col_header}]") + "\n" + self.rollingText
-                        cell.value = str(f"[{row_header}] and [{col_header}]")
-                        #cell.value = response.choices[0].message.content
-                        self.responseAPItext.setText(self.rollingText)
             print("in config dialog")
 
             Display.show_message_box("SuccessExtend", "API connection successful Extend!\nResponse: " + self.rollingText)

@@ -2,10 +2,11 @@ import sys
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton, QComboBox
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QStandardItem,QStandardItemModel
 from node_editor.node import Node
 from utils.display import Display
 from utils.llmconnection import LLMConnection
+from utils.datamodels import SelectedLLM
 import json
 
 class ConfigDialog(QDialog):
@@ -43,19 +44,22 @@ class ConfigDialog(QDialog):
         """)
         self.responseAPItext.setReadOnly(True)
         self.max_tokens_slider = QSlider(Qt.Horizontal)
-        self.max_tokens_slider.setRange(256, 4096)
+        self.max_tokens_slider.setRange(256, 32000)
         self.max_tokens_slider.setValue(config.get("max_tokens", 150))
         self.max_tokens_slider.setTickPosition(QSlider.TicksBelow)
         self.max_tokens_slider.setTickInterval(256)
-        self.max_tokens_slider.setValue(1024)
+        #self.max_tokens_slider.setValue(1024)
         self.max_tokens_value_label = QLabel(str(self.max_tokens_slider.value()))
         
         self.max_tokens_slider.valueChanged.connect(self.update_max_tokens_label)
+        self.model_dropdown = QComboBox()
+        self.populate_model_dropdown()
+        self.model_dropdown.currentIndexChanged.connect(self.on_modeldropdown_changed)
+        self.on_modeldropdown_changed()
 
-        self.model = QLineEdit(config.get("model", "gpt-3.5-turbo"))
         self.id_field = QLineEdit(config.get("id", ""))
         self.object_field = QLineEdit(config.get("object", ""))
-        self.usage_tokens_field = QLineEdit(config.get("usage_tokens", ""))
+        self.temparature_field = QLineEdit(config.get("temperature", ""))
 
         self.advanced_options_checkbox = QCheckBox("Show Advanced Options")
         self.advanced_options_checkbox.stateChanged.connect(self.toggle_advanced_options)
@@ -71,10 +75,10 @@ class ConfigDialog(QDialog):
         self.layout.addRow(self.advanced_options_checkbox)
 
         self.advanced_options_layout = QFormLayout()
-        self.advanced_options_layout.addRow("Model:", self.model)
+        self.advanced_options_layout.addRow("Model: Input-Output Price/1M tokens:", self.model_dropdown)
         self.advanced_options_layout.addRow("ID:", self.id_field)
         self.advanced_options_layout.addRow("Object:", self.object_field)
-        self.advanced_options_layout.addRow("Usage Tokens:", self.usage_tokens_field)
+        self.advanced_options_layout.addRow("Temperature:", self.temparature_field)
 
         self.advanced_options_widget = QtWidgets.QWidget()
         self.advanced_options_widget.setLayout(self.advanced_options_layout)
@@ -113,14 +117,57 @@ class ConfigDialog(QDialog):
     def toggle_advanced_options(self):
         self.advanced_options_widget.setVisible(self.advanced_options_checkbox.isChecked())
 
+    def populate_model_dropdown(self):
+        self.model_dropdown.clear()
+        llm_models = QStandardItemModel()
+        # for text, value in LLM_MODELS:
+        #     self.model_dropdown.addItem(text, value)
+        sLLM = SelectedLLM()
+        for display_text, primary_value, secondary_value in sLLM.available_llms:
+            item = QStandardItem(display_text)
+            item.setData(primary_value, Qt.UserRole)
+            item.setData(secondary_value, Qt.UserRole + 1)
+            llm_models.appendRow(item)
+        self.model_dropdown.setModel(llm_models)
+        self.set_model_value(sLLM.selected_model)
+
+    def set_model_value(self, value):
+        model = self.model_dropdown.model()
+        for index in range(model.rowCount()):
+            item = model.item(index)
+            item_value = item.data(Qt.UserRole)  
+            if item_value == value:
+                self.model_dropdown.setCurrentIndex(index)
+                break
+ 
+    def get_model_selected_value(self):
+        current_index = self.model_dropdown.currentIndex()
+        if current_index >= 0:
+            model = self.model_dropdown.model()
+            item = model.item(current_index)
+            return item.data(Qt.UserRole)
+        return None
+
+    def get_model_selected_secondary_value(self):
+        current_index = self.model_dropdown.currentIndex()
+        if current_index >= 0:
+            model = self.model_dropdown.model()
+            item = model.item(current_index)
+            return item.data(Qt.UserRole + 1)
+        return 4096
+
+
+    def on_modeldropdown_changed(self):
+        max = self.get_model_selected_secondary_value()
+        self.max_tokens_slider.setRange(256, int(max))
+
     def test_api_connection(self):
-        #response = OpenAIConnection.call_prompt(self.textbox.toPlainText(),self.config["system_prompt"],self.config["model"])        
         try:
             connection = LLMConnection()
             complete_prompt = self.user_prompt.toPlainText() + "\n" + self.additional_input
-            response = connection.call_prompt(complete_prompt,self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-            Display.show_message_box( "Success", "API connection successful!\nResponse: " + response.choices[0].message.content)
-            self.responseAPItext.setText(response.choices[0].message.content)
+            response = connection.call_prompt(complete_prompt,self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+            Display.show_message_box( "Success", "API connection successful!\nResponse: " + str(response))
+            self.responseAPItext.setText(str(response))
         except Exception as e:
             print("Error", f"API connection failed!\nError: {str(e)}")
             Display.show_error_box( "Error", f"API connection failed!\nError: {str(e)}")
@@ -132,10 +179,10 @@ class ConfigDialog(QDialog):
             "output": self.responseAPItext.toPlainText(),
             "max_tokens": self.max_tokens_slider.value(),
             "additional_input": self.complete_prompt.toPlainText(),
-            "model": self.model.text(),
+            "model": self.get_model_selected_value(),
             "id": self.id_field.text(),
             "object": self.object_field.text(),
-            "usage_tokens": self.usage_tokens_field.text()
+            "temperature": self.temparature_field.text()
         }
         return json.dumps(config)
     

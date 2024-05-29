@@ -2,5 +2,8 @@ pyqtdarktheme
 PySide6
 Pandas
 Openpyxl
-win32com
-pptx
+pywin32
+python-pptx
+openai
+google-generativeai
+dotenv

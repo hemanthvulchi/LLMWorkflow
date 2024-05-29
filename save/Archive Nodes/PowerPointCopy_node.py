@@ -32,7 +32,7 @@ class PwrPointProcessorCopy_Node(Node):
             "model": "gpt-3.5-turbo",
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
         # Create a single instance of the ExtendedConfigDialog

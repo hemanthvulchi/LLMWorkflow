@@ -3,8 +3,8 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtCore import Qt
 from node_editor.node import Node
-from node_editor.openaiconnection import OpenAIConnection
 from node_editor.configdialog import ConfigDialog
+from node_editor.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
 
@@ -14,22 +14,19 @@ class Input_Node(Node):
         super().__init__()
 
         self.title_text = "GenAI Input"
-        self.type_text = "Data to be entered"
-        self.set_color(title_color=(15, 129, 126))
+        self.type_text = "Process data using GenAI"
+        self.set_color(title_color=(32, 118, 146))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()
-        self.con = OpenAIConnection()
-        #self.openAIclient = self.con.get_connection()
 
         self.config = {
             "user_prompt": "please write a detailed report on the below material",
             "system_prompt": "You are a security risk professional",
             "output":"",
-            "max_tokens": 64,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
     def init_widget(self):
@@ -77,15 +74,16 @@ class Input_Node(Node):
             self.responsetext.setText(self.config["output"])
             self.textbox.setText(self.config["user_prompt"])
             self.pin_output.set_data(self.responsetext.toPlainText())
+            if self.pin_output.get_data() != "":
+                self.status = Node_Status.CLEAN            
         print("Pin output data:", self.pin_output.get_data())
 
 
     def btn_chat(self):
-
         connection = LLMConnection()
-
-        response = connection.call_prompt(self.textbox.toPlainText(),self.config["system_prompt"],self.config["model"])
-        self.responsetext.setText(response.choices[0].message.content)
+        response = connection.call_prompt(self.textbox.toPlainText(),self.config["system_prompt"])
+        self.status = Node_Status.CLEAN  
+        self.responsetext.setText(str(response))
         self.pin_output.set_data(self.responsetext.toPlainText())
 
 class ExtendedConfigDialog(ConfigDialog):

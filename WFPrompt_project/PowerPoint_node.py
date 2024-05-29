@@ -5,6 +5,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from node_editor.node import Node
 from node_editor.configdialog import ConfigDialog
+from node_editor.common import Node_Status
 from utils.display import Display
 from utils.llmconnection import LLMConnection
 from pptx.util import Inches
@@ -18,7 +19,7 @@ class PwrPointProcessor_Node(Node):
         super().__init__()
         self.title_text = "PowerPoint Assistant"
         self.type_text = "Directly work in powerpoint"
-        self.set_color(title_color=(0, 128, 0))
+        self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build()
@@ -29,11 +30,10 @@ class PwrPointProcessor_Node(Node):
                              " and then reference information,with which you will have to reivew the slide content",
             "output":"",
             "additional_input":"",
-            "max_tokens": 256,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
         # Create a single instance of the ExtendedConfigDialog
@@ -74,7 +74,7 @@ class PwrPointProcessor_Node(Node):
         super().init_widget()
 
     def show_configuration(self):
-        #self.config['input1'] = 
+        self.btn_refresh()
         if self.pin_A:
             self.config['additional_input'] = str(self.pin_A.connected_pin.get_data())
             print("[Excel Process] added data:",self.config['additional_input'])
@@ -85,6 +85,8 @@ class PwrPointProcessor_Node(Node):
             self.responsetext.setText(self.config["output"])
             self.textbox.setText(self.dialog.complete_prompt.toPlainText())
             self.pin_output.set_data(self.responsetext.toPlainText())
+        if self.pin_output.get_data() != "":
+            self.status = Node_Status.CLEAN
         print("Pin output data:", self.pin_output.get_data())
 
     def btn_refresh(self):
@@ -167,8 +169,8 @@ class ExtendedConfigDialog(ConfigDialog):
                     if shape.HasTextFrame:
                         slide_text += shape.TextFrame.TextRange.Text
                 inputText = self.user_prompt.toPlainText() + str(slide_text) + self.post_prompt.toPlainText() +  "\n" + self.additional_input                        
-                response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                outputText = response.choices[0].message.content
+                response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+                outputText = str(response)
                 if ppt_slide.HasNotesPage:
                     notes_page = ppt_slide.NotesPage
                     notes_shape = notes_page.Shapes.Placeholders[2]  # Placeholder for notes text
@@ -178,8 +180,8 @@ class ExtendedConfigDialog(ConfigDialog):
                     ppt_slide.NotesPage.Shapes.Placeholders[2].TextFrame.TextRange.Text = f"Automated Review:\n{outputText}"
                 # Add the comment with the combined text
                 inputText = self.comments_prompt.toPlainText() + str(slide_text) + self.post_prompt.toPlainText() +  "\n" + self.additional_input                        
-                response_commment = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                outputText_comment = response_commment.choices[0].message.content
+                response_commment = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+                outputText_comment = str(response)
                 comment = ppt_slide.Comments.Add(
                     Left=100,
                     Top=100,

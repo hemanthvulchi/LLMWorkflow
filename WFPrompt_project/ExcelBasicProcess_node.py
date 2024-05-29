@@ -2,6 +2,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from node_editor.node import Node
 from node_editor.configdialog import ConfigDialog
+from node_editor.common import Node_Status
 from openpyxl.utils import range_boundaries, get_column_letter
 from utils.display import Display
 from utils.llmconnection import LLMConnection
@@ -17,7 +18,7 @@ class ExcelBasicProcess_Node(Node):
         super().__init__()
         self.title_text = "Excel Assistant"
         self.type_text = "Directly work in excel"
-        self.set_color(title_color=(0, 128, 0))
+        self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build()
@@ -27,11 +28,10 @@ class ExcelBasicProcess_Node(Node):
             "system_prompt": "You are a security risk professional",
             "output":"",
             "additional_input":"",
-            "max_tokens": 64,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
         # Create a single instance of the ExtendedConfigDialog
@@ -72,7 +72,7 @@ class ExcelBasicProcess_Node(Node):
         super().init_widget()
 
     def show_configuration(self):
-        #self.config['input1'] = 
+        self.btn_refresh()
         if self.pin_A:
             self.config['additional_input'] = str(self.pin_A.connected_pin.get_data())
             print("[Excel Process] added data:",self.config['additional_input'])
@@ -83,6 +83,8 @@ class ExcelBasicProcess_Node(Node):
             self.responsetext.setText(self.config["output"])
             self.textbox.setText(self.dialog.complete_prompt.toPlainText())
             self.pin_output.set_data(self.responsetext.toPlainText())
+        if self.pin_output.get_data() != "":
+            self.status = Node_Status.CLEAN        
         print("Pin output data:", self.pin_output.get_data())
 
     def btn_refresh(self):
@@ -150,8 +152,6 @@ class ExtendedConfigDialog(ConfigDialog):
 
     def get_configuration(self):
         config = json.loads(super().get_configuration())
-        config["extra_field1"] = self.extra_field1.text()
-        config["extra_field2"] = self.extra_field2.text()
         return json.dumps(config)
 
     def excel_combobox_updated(index):
@@ -252,12 +252,12 @@ class ExtendedConfigDialog(ConfigDialog):
                     for cell in row:
                         if cell.value is not None:
                             inputText = self.user_prompt.toPlainText() + str(cell.value) + self.post_prompt.toPlainText() +  "\n" + self.additional_input
-                            response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                            self.outputText = response.choices[0].message.content
+                            response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+                            self.outputText = str(response)
                             print("---------------------------------------------------")
                             print(self.outputText)
                             self.rollingText = self.outputText + "\n" + self.rollingText
-                            cell.value = response.choices[0].message.content
+                            cell.value = str(response)
                             self.responseAPItext.setText(self.rollingText)
             #for condition where we want to answer based on the row and column header
             else:
@@ -272,13 +272,13 @@ class ExtendedConfigDialog(ConfigDialog):
                             col_header = sheet.cell(row=start_row, column=cell.column).value                                               
                             inputText = self.user_prompt.toPlainText() + str(f"[{row_header}] and [{col_header}]") + \
                                         self.post_prompt.toPlainText() +  "\n" + self.additional_input
-                            response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                            self.outputText = response.choices[0].message.content
+                            response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+                            self.outputText = str(response)
                             print("---------------------------------------------------")
                             print(self.outputText)
                             self.rollingText = self.outputText + "\n" + self.rollingText
                             self.rollingText = str(f"[{row_header}] and [{col_header}]") + "\n" + self.rollingText
-                            cell.value = response.choices[0].message.content
+                            cell.value = str(response)
                             self.responseAPItext.setText(self.rollingText)                                            
             print("in config dialog")
 

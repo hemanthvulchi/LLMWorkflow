@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
-
+from node_editor.common import Node_Status
 from node_editor.node import Node
 from WFPrompt_project.common_widgets import FloatLineEdit
 
@@ -11,7 +11,7 @@ class SimpleInput_Node(Node):
 
         self.title_text = "Simple Input"
         self.type_text = "Just Add Simple Input"
-        self.set_color(title_color=(15, 129, 126))
+        self.set_color(title_color=(32, 118, 146))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()
 
@@ -23,6 +23,7 @@ class SimpleInput_Node(Node):
         self.textbox = QtWidgets.QTextEdit()
         self.textbox.setMinimumHeight(200)
         self.textbox.setMinimumWidth(100)
+        self.textbox.textChanged.connect(self.inputupdated)
         self.btn = QtWidgets.QPushButton("Save")
         self.btn.clicked.connect(self.btn_cmd)
 
@@ -41,4 +42,9 @@ class SimpleInput_Node(Node):
         print("btn command:")
         self.pin_output.set_data(self.textbox.toPlainText())
         print("btn command:",self.pin_output.get_data())
+        if self.pin_output.get_data() != "":
+            self.status = Node_Status.CLEAN
         #self.compute()
+
+    def inputupdated(self):
+            self.status = Node_Status.DIRTY

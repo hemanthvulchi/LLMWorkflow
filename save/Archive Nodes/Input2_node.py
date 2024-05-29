@@ -30,7 +30,7 @@ class Input2_Node(Node):
             "model": "gpt-3.5-turbo",
             "id": "",
             "object": "",
-            "usage_tokens": ""
+            "temperature": ""
         }
 
     def init_widget(self):

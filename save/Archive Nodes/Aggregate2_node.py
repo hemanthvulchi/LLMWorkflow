@@ -38,7 +38,7 @@ class Aggregate2_Node(Node):
             "model": "gpt-3.5-turbo",
             "id": "",
             "object": "",
-            "usage_tokens": "",
+            "temperature": "",
             "input1":"",
             "input2":""
         }
