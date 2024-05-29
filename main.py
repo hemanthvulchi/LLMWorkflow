@@ -24,14 +24,26 @@ from utils.display import Display
 from utils.datamodels import ModelSelection
 from node_editor.configdialog import ConfigDialog
 from utils.llmconnection import LLMConnection
-from utils.display import Display
-from pptx import Presentation
-from pptx.util import Inches
-import win32com.client
-import pandas as pd
-import openpyxl
-import pandas as pd
-from PySide6.QtPrintSupport import QPrinter, QPrintDialog
+#from WFPrompt_project import Aggregate_node,Combine_node,ExcelAdvancedProcess_node,ExcelBasicProcess_node,Input_node,Meeting_node,PowerPoint_node,PowerPointAdvanced_node,Print_node, SimpleInput_node
+from WFPrompt_project.Aggregate_Node import Aggregate_Node
+from WFPrompt_project.Combine_Node import Combine_Node
+from WFPrompt_project.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
+from WFPrompt_project.ExcelBasicProcess_Node import ExcelBasicProcess_Node
+from WFPrompt_project.Input_Node import Input_Node
+from WFPrompt_project.Meeting_Node import Meeting_Node
+from WFPrompt_project.PowerPoint_Node import PowerPoint_Node
+from WFPrompt_project.PowerPointAdvanced_Node import PowerPointAdvanced_Node
+from WFPrompt_project.Print_Node import Print_Node
+from WFPrompt_project.SimpleInput_Node import SimpleInput_Node
+
+# from utils.display import Display
+# from pptx import Presentation
+# from pptx.util import Inches
+# import win32com.client
+# import pandas as pd
+# import openpyxl
+# import pandas as pd
+# from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -84,7 +96,7 @@ class NodeEditor(QtWidgets.QMainWindow):
 
         # Load the example project | need to replace 
         #load_project_path = (Path(__file__).parent.resolve() / 'Example_project')
-        load_project_path = (Path(__file__).parent.resolve() / 'WFPrompt_project')
+        load_project_path = (Path(__file__).parent.resolve())
         self.load_project(load_project_path)
 
         # Restore GUI from last state
@@ -102,45 +114,52 @@ class NodeEditor(QtWidgets.QMainWindow):
         file_path, _ = file_dialog.getSaveFileName()
         self.node_widget.save_project(file_path)
 
-    def load_project(self, project_path=None):
-        if not project_path:
-            return
+    def load_project(self,project_path=None):
+        # Preloaded classes
+        self.imports = {}
+        self.imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
+        self.imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
+        self.imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
+        self.imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
+        self.imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__}
+        self.imports['Meeting_Node'] = {"class": Meeting_Node, "module": Meeting_Node.__module__}
+        self.imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
+        self.imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
+        self.imports['Print_Node'] = {"class": Print_Node, "module": Print_Node.__module__}
+        self.imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__}
 
-        project_path = Path(project_path)
-        if project_path.exists() and project_path.is_dir():
-            self.project_path = project_path
+        # Update project with the preloaded classes
+        self.node_list.update_project(self.imports)
 
-            self.imports = {}
+            # for file in project_path.glob("*.py"):
 
-            for file in project_path.glob("*.py"):
+            #     if not file.stem.endswith('_node'):
+            #         print('file:', file.stem)
+            #         continue
+            #     spec = importlib.util.spec_from_file_location(file.stem, file)
+            #     module = importlib.util.module_from_spec(spec)
+            #     spec.loader.exec_module(module)
 
-                if not file.stem.endswith('_node'):
-                    print('file:', file.stem)
-                    continue
-                spec = importlib.util.spec_from_file_location(file.stem, file)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
+            #     for name, obj in inspect.getmembers(module):
+            #         if not name.endswith('_Node'):
+            #             continue
+            #         if inspect.isclass(obj):
+            #             self.imports[obj.__name__] = {"class": obj, "module": module}
+            #             #break
 
-                for name, obj in inspect.getmembers(module):
-                    if not name.endswith('_Node'):
-                        continue
-                    if inspect.isclass(obj):
-                        self.imports[obj.__name__] = {"class": obj, "module": module}
-                        #break
+        #self.node_list.update_project(self.imports)
 
-            self.node_list.update_project(self.imports)
-
-            # work on just the first json file. add the ablitity to work on multiple json files later
-            for json_path in project_path.glob("*.json"):
-                self.node_widget.load_scene(json_path, self.imports)
-                break
+        # work on just the first json file. add the ablitity to work on multiple json files later
+        for json_path in project_path.glob("*.json"):
+            self.node_widget.load_scene(json_path, self.imports)
+            break
 
     def get_project_path(self):
-        project_path = QtWidgets.QFileDialog.getExistingDirectory(None, "Select Project Folder", "")
-        if not project_path:
-            return
-
-        self.load_project(project_path)
+        json_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            None, "Select JSON File", "", "JSON Files (*.json)"
+        )
+        if json_path:
+            self.node_widget.load_scene(json_path, self.imports)
 
     def closeEvent(self, event):
         """

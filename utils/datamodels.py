@@ -47,12 +47,16 @@ class ModelSelection:
         company_combo = QComboBox()
         company_combo.addItems(self.llm_companies)
         model_combo = QComboBox()
+        label_disclaimer = QLabel("Connection to OpenAI and Google Gemini are done with my personal API keys (my own cost). Have mercy :)")
+        label_warning = QLabel("This is a proof of concept and has not been approved for official use")
 
         layout.addWidget(company_label, 0, 0)
         layout.addWidget(company_combo, 0, 1)
         layout.addWidget(model_label_details, 1, 1)        
         layout.addWidget(model_label, 2, 0)
         layout.addWidget(model_combo, 2, 1)
+        layout.addWidget(label_disclaimer, 4, 0, 1, 2)
+        layout.addWidget(label_warning, 5, 0, 1, 2)
 
 
         def on_company_change(index):

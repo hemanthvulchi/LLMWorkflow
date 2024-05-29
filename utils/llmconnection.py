@@ -38,8 +38,8 @@ class LLMConnection:
         
 class OpenAIConnection:
     def __init__(self,model):
-        self.connection = OpenAI()
-        #self.connection= OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "sk-proj-NmNJZ8iMHOfzeHYTYEyuT3BlbkFJJP8yWQEXoPrgCEh3hFBy"))
+        #self.connection = OpenAI()
+        self.connection= OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "sk-proj-NmNJZ8iMHOfzeHYTYEyuT3BlbkFJJP8yWQEXoPrgCEh3hFBy"))
         self.thread = None
         self.assistant = None
         self.delay = 0.1
@@ -126,8 +126,8 @@ class OpenAIConnection:
 
 class GoogleGeminiConnection:
     def __init__(self, model):
-        GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-        genai.configure(api_key=GOOGLE_API_KEY)
+        #GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+        genai.configure(api_key=os.environ.get("GOOGLE_API_KEY", "AIzaSyCRQ-q8rvENUrHvgXxmWA2lwJO6zJ-dVKI"))
         self.chatOn="ON"
         self.gemini_model = genai.GenerativeModel(model)
         if self.chatOn == "ON":

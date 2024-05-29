@@ -13,7 +13,7 @@ import win32com.client
 import pandas as pd
 import json
 
-class PwrPointAdvancedProcessor_Node(Node):
+class PowerPointAdvanced_Node(Node):
     def __init__(self):
         super().__init__()
         self.title_text = "Adv PwrPnt Assistant"

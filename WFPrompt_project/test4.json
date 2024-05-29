@@ -1,13 +1,13 @@
 {
     "nodes": [
         {
-            "type": "PwrPointAdvancedProcessor_Node",
+            "type": "PowerPointAdvanced_Node",
             "x": 6047,
             "y": 5101,
             "uuid": "41de2473-6741-477b-a539-5e4f8619e87f"
         },
         {
-            "type": "PwrPointProcessor_Node",
+            "type": "PowerPoint_Node",
             "x": 5580,
             "y": 5123,
             "uuid": "09934e4e-a07b-4318-9d3b-f6fc2defc058"

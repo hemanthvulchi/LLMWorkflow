@@ -14,7 +14,7 @@ import pandas as pd
 import json
 
 
-class PwrPointProcessor_Node(Node):
+class PowerPoint_Node(Node):
     def __init__(self):
         super().__init__()
         self.title_text = "PowerPoint Assistant"
