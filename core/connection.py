@@ -1,4 +1,4 @@
-from node_editor.gui.connection_graphics import Connection_Graphics
+from core.gui.connection_graphics import Connection_Graphics
 
 
 class Connection(Connection_Graphics):

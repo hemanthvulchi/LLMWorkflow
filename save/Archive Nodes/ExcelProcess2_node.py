@@ -1,9 +1,9 @@
 
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
-from node_editor.node import Node
-from node_editor.configdialog import ConfigDialog
-from node_editor.openaiconnection import OpenAIConnection
+from core.node import Node
+from core.configdialog import ConfigDialog
+from core.openaiconnection import OpenAIConnection
 from openpyxl.utils import range_boundaries
 from util.display import Display
 import openpyxl

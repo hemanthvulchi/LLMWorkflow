@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
-from node_editor.common import Node_Status
-from node_editor.node import Node
+from core.common import Node_Status
+from core.node import Node
 from WFPrompt_project.common_widgets import FloatLineEdit
 
 

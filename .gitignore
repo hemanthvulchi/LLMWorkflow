@@ -17,15 +17,21 @@ build/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# db
+db/
 
 # Environments
 .env
 .venv
 env/
 
-# playground
+
+# playground and test
 playground/
+test.py
+# save and settingsfolder
+save/
+settings/
 
 # mypy
 .mypy_cache/

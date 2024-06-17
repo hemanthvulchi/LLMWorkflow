@@ -2,10 +2,9 @@ from contextlib import suppress
 
 from PySide6 import QtCore, QtWidgets
 
-from node_editor.connection import Connection
-from node_editor.node import Node
-from node_editor.pin import Pin
-
+from core.connection import Connection
+from core.node import Node
+from core.pin import Pin
 
 class NodeEditor(QtCore.QObject):
     """
@@ -157,3 +156,4 @@ class NodeEditor(QtCore.QObject):
                 return True
 
         return super().eventFilter(watched, event)
+

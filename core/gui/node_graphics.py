@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPainter, QBrush,QPen
-from node_editor.common import Node_Status
+from core.common import Node_Status
+from PySide6.QtWidgets import QGraphicsDropShadowEffect
 
 
 class Node_Graphics(QtWidgets.QGraphicsItem):
@@ -51,12 +51,12 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         self.title_color = QtGui.QColor(title_color[0], title_color[1], title_color[2])
         self.node_color = QtGui.QColor(background_color[0], background_color[1], background_color[2])
 
-    def draw_glow(self, painter, path, color, blur_radius=12):
+    def draw_glow(self, painter, path, color, blur_radius=15):
         """Draws a glow effect around the given path."""
         for i in range(blur_radius, 10, -1):
             alpha = 255 - (i / blur_radius) * 255
             glow_color = QtGui.QColor(color)
-            glow_color.setAlpha(alpha)
+            glow_color.setAlpha(alpha/6)
             glow_pen = QtGui.QPen(glow_color, i, Qt.SolidLine)
             painter.setPen(glow_pen)
             painter.setBrush(Qt.NoBrush)
@@ -76,7 +76,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         painter.setBrush(self.node_color)
         painter.drawPath(self.path)
         glow_color = self.get_status_color()
-        #self.draw_glow(painter, self.path, glow_color)
+        #self.draw_glow(painter, self.path, glow_color)        
         gradient = QtGui.QLinearGradient()
         gradient.setStart(0, -90)
         gradient.setFinalStop(0, 0)

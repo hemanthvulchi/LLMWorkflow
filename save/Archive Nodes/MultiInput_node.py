@@ -2,8 +2,8 @@ import sys
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QSpinBox, QVBoxLayout, QHBoxLayout, QPushButton
 from PySide6.QtGui import QColor
-from node_editor.node import Node
-from node_editor.openaiconnection import OpenAIConnection
+from core.node import Node
+from core.openaiconnection import OpenAIConnection
 import openai
 import json
 

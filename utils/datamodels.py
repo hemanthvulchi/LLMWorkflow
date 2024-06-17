@@ -25,7 +25,6 @@ class ModelSelection:
                 ("GPT-4o(128K): $5.00 & $15.00", "gpt-4o", "128000"),
                 ("GPT-4-turbo(128K): $10.00 & $30.00", "gpt-4-turbo", "128000"),
                 ("GPT-4(8K): $30.00 & $60.00", "gpt-4", "8192"),
-                ("GPT-3.5-turbo-instruct(4K): $1.50 & $2.00", "gpt-3.5-turbo-instruct", "4096"),
                 ("GPT-3.5-turbo(16K): $0.50 & $1.50", "gpt-3.5-turbo", "16385")
             ],
             "Google Gemini": [

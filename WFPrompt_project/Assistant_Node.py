@@ -9,12 +9,12 @@ from utils.llmconnection import LLMConnection
 import json
 
 # Set your OpenAI API key here
-class Input_Node(Node):
+class Assistant_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title_text = "GenAI Input"
-        self.type_text = "Process data using GenAI"
+        self.title_text = "Assistant Node"
+        self.type_text = "Create an custom thread"
         self.set_color(title_color=(32, 118, 146))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()

@@ -18,13 +18,13 @@ import inspect
 from PySide6 import QtCore, QtGui, QtWidgets
 import qdarktheme
 
-from node_editor.gui.node_list import NodeList
-from node_editor.gui.node_widget import NodeWidget
+from core.gui.node_list import NodeList
+from core.gui.node_widget import NodeWidget
 from utils.display import Display
 from utils.datamodels import ModelSelection
-from node_editor.configdialog import ConfigDialog
+from core.configdialog import ConfigDialog
 from utils.llmconnection import LLMConnection
-#from WFPrompt_project import Aggregate_node,Combine_node,ExcelAdvancedProcess_node,ExcelBasicProcess_node,Input_node,Meeting_node,PowerPoint_node,PowerPointAdvanced_node,Print_node, SimpleInput_node
+from utils.vectordb import VectorDB
 from WFPrompt_project.Aggregate_Node import Aggregate_Node
 from WFPrompt_project.Combine_Node import Combine_Node
 from WFPrompt_project.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
@@ -35,15 +35,6 @@ from WFPrompt_project.PowerPoint_Node import PowerPoint_Node
 from WFPrompt_project.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from WFPrompt_project.Print_Node import Print_Node
 from WFPrompt_project.SimpleInput_Node import SimpleInput_Node
-
-# from utils.display import Display
-# from pptx import Presentation
-# from pptx.util import Inches
-# import win32com.client
-# import pandas as pd
-# import openpyxl
-# import pandas as pd
-# from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -72,6 +63,13 @@ class NodeEditor(QtWidgets.QMainWindow):
         save_action = QtGui.QAction("Save Project", self)
         save_action.triggered.connect(self.save_project)
         file_menu.addAction(save_action)
+
+        reference_menu = QtWidgets.QMenu("Reference Files", self)
+        self.menuBar().addMenu(reference_menu)
+        updateDB_action = QtGui.QAction("Update Database", self)
+        updateDB_action.triggered.connect(self.update_vectorDB)
+        reference_menu.addAction(updateDB_action)
+        
 
         # Layouts
         main_widget = QtWidgets.QWidget()
@@ -131,6 +129,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         # Update project with the preloaded classes
         self.node_list.update_project(self.imports)
 
+        #old code, where it would dynamically import the classes
             # for file in project_path.glob("*.py"):
 
             #     if not file.stem.endswith('_node'):
@@ -160,6 +159,10 @@ class NodeEditor(QtWidgets.QMainWindow):
         )
         if json_path:
             self.node_widget.load_scene(json_path, self.imports)
+
+    def update_vectorDB(self):
+        vDB = VectorDB()
+        vDB.update_db()
 
     def closeEvent(self, event):
         """
@@ -191,6 +194,7 @@ if __name__ == "__main__":
         model_selection.select_models()        
         app.setWindowIcon(QtGui.QIcon("resources\\ai.jpg"))
         qdarktheme.setup_theme()
+        vDB = VectorDB()
         launcher = NodeEditor()
         launcher.show()
         app.exec()

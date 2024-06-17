@@ -1,4 +1,4 @@
-from node_editor.openaiconnection import OpenAIConnection
+from core.openaiconnection import OpenAIConnection
 con = OpenAIConnection()
 client1 = con.get_connection()
 print(client1)

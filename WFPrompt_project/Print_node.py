@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
-from node_editor.node import Node
+from core.node import Node
 
 
 

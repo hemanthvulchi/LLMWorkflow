@@ -1,5 +1,5 @@
 from PySide6 import QtWidgets
-from node_editor.node import Node
+from core.node import Node
 
 
 class Summarize_Node(Node):

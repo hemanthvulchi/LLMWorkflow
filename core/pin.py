@@ -1,5 +1,5 @@
-from node_editor.gui.pin_graphics import Pin_Graphics
-from node_editor.connectionobject import PinConnectionObject
+from core.gui.pin_graphics import Pin_Graphics
+from core.connectionobject import PinConnectionObject
 
 
 class Pin(Pin_Graphics):

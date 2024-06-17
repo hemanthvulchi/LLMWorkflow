@@ -1,8 +1,8 @@
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
-from node_editor.node import Node
-from node_editor.configdialog import ConfigDialog
-from node_editor.common import Node_Status
+from core.node import Node
+from core.configdialog import ConfigDialog
+from core.common import Node_Status
 from openpyxl.utils import range_boundaries, get_column_letter
 from utils.display import Display
 from utils.llmconnection import LLMConnection
@@ -247,11 +247,8 @@ class ExtendedConfigDialog(ConfigDialog):
             connection = LLMConnection()
             self.selected_company = sLLM.selected_company
             inputText = ""
-            if self.selected_company == "OpenAI GPTs":
-                connection.initiate_assistant("Excel Iterator",self.system_prompt.toPlainText())
-                assistant_output = connection.call_assistant("Here is data for reference:\n\n" + self.additional_input, self.max_tokens_slider.value())            
-            elif self.selected_company == "Google Gemini":
-                assistant_output = connection.call_prompt(self.system_prompt.toPlainText() +"\n" + self.additional_input, self.max_tokens_slider.value())
+            connection.initiate_assistant("Excel Iterator",self.system_prompt.toPlainText())
+            assistant_output = connection.call_assistant("Here is data for reference:\n\n" + self.additional_input, self.max_tokens_slider.value())            
             inputText = ""
             self.outputText = ""
             self.rollingText = ""
@@ -263,10 +260,7 @@ class ExtendedConfigDialog(ConfigDialog):
                     for cell in row:
                         if cell.value is not None:
                             inputText = self.user_prompt.toPlainText() + str(cell.value) + self.post_prompt.toPlainText()
-                            if self.selected_company == "OpenAI GPTs":
-                                assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())            
-                            elif self.selected_company == "Google Gemini":
-                                assistant_output = connection.call_prompt(inputText, self.max_tokens_slider.value())                            
+                            assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value(),embeddings=self.use_reference_data_checkbox.isChecked())            
                             #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
                             self.outputText = assistant_output
                             print("---------------------------------------------------")
@@ -287,11 +281,7 @@ class ExtendedConfigDialog(ConfigDialog):
                             col_header = sheet.cell(row=start_row, column=cell.column).value                                               
                             inputText = self.user_prompt.toPlainText() + str(f"[{row_header}] and [{col_header}]") + \
                                         self.post_prompt.toPlainText() +  "\n" 
-                            if self.selected_company == "OpenAI GPTs":
-                                assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value())            
-                            elif self.selected_company == "Google Gemini":
-                                assistant_output = connection.call_prompt(inputText, self.max_tokens_slider.value())                            
-                            #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
+                            assistant_output = connection.call_assistant(inputText, self.max_tokens_slider.value(),embeddings=self.use_reference_data_checkbox.isChecked())            
                             self.outputText = assistant_output
                             print("---------------------------------------------------")
                             print(self.outputText)

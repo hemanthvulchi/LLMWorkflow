@@ -1,9 +1,9 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
-from node_editor.pin import Pin
-from node_editor.gui.node_graphics import Node_Graphics
-from node_editor.common import Node_Status
+from core.pin import Pin
+from core.gui.node_graphics import Node_Graphics
+from core.common import Node_Status
 
 
 class Node(Node_Graphics):

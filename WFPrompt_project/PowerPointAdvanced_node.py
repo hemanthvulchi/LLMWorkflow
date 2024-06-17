@@ -2,37 +2,35 @@ import os
 import sys
 import traceback
 from PySide6 import QtWidgets
-from PySide6.QtWidgets import QLabel, QTextEdit, QPushButton, QFileDialog, QMessageBox, QFormLayout, QApplication
-from node_editor.node import Node
-from node_editor.configdialog import ConfigDialog
+from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
+from core.node import Node
+from core.configdialog import ConfigDialog
+from core.common import Node_Status
 from utils.display import Display
 from utils.llmconnection import LLMConnection
-from pptx import Presentation
 from pptx.util import Inches
 import win32com.client
 import pandas as pd
 import json
 
+
 class PowerPointAdvanced_Node(Node):
     def __init__(self):
         super().__init__()
-        self.title_text = "Adv PwrPnt Assistant"
-        self.type_text = "APIs in beta - WIP"
-        self.set_color(title_color=(190, 0, 0))
+        self.title_text = "Advanced PowerPoint Assistant"
+        self.type_text = "Directly work in powerpoint"
+        self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
-        self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
-        self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)        
         self.build()
 
         self.config = {
             "user_prompt": "content from slide:",
-            "system_prompt": "You are a security risk professional. You will be presented with slide data and then reference information,"
-                             "with which you will have to reivew the slide content",
+            "system_prompt": "You are a security risk professional. You will be presented with slide data" 
+                             " and then reference information,with which you will have to reivew the slide content",
             "output":"",
             "additional_input":"",
-            "max_tokens": 64,
-            "model": "gpt-3.5-turbo",
+            "max_tokens": 1024,
             "id": "",
             "object": "",
             "temperature": ""
@@ -43,7 +41,7 @@ class PowerPointAdvanced_Node(Node):
         
     def init_widget(self):
         self.widget = QtWidgets.QWidget()
-        self.widget.setFixedWidth(150)
+        self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.textbox = QTextEdit()
@@ -63,7 +61,7 @@ class PowerPointAdvanced_Node(Node):
         self.config_btn = QtWidgets.QPushButton("Configure")
         self.config_btn.clicked.connect(self.show_configuration)
 
-        #layout.addWidget(self.textbox)
+        layout.addWidget(self.textbox)
         layout.addWidget(self.responsetext)
         layout.addWidget(self.btn)
         layout.addWidget(self.config_btn)
@@ -76,16 +74,19 @@ class PowerPointAdvanced_Node(Node):
         super().init_widget()
 
     def show_configuration(self):
-        #self.config['input1'] = 
+        self.btn_refresh()
         if self.pin_A:
             self.config['additional_input'] = str(self.pin_A.connected_pin.get_data())
             print("[Excel Process] added data:",self.config['additional_input'])
-        self.dialog = ExtendedConfigDialog(json.dumps(self.config), QtWidgets.QMainWindow())            
+        main_window = QtWidgets.QMainWindow()
+        self.dialog = ExtendedConfigDialog(json.dumps(self.config), main_window)            
         if self.dialog.exec():
             self.config = json.loads(self.dialog.get_configuration())
             self.responsetext.setText(self.config["output"])
             self.textbox.setText(self.dialog.complete_prompt.toPlainText())
             self.pin_output.set_data(self.responsetext.toPlainText())
+        if self.pin_output.get_data() != "":
+            self.status = Node_Status.CLEAN
         print("Pin output data:", self.pin_output.get_data())
 
     def btn_refresh(self):
@@ -105,22 +106,27 @@ class ExtendedConfigDialog(ConfigDialog):
     
     def __init__(self, config_json, parent=None):
         super(ExtendedConfigDialog, self).__init__(config_json, parent)
-
         self.ppt_app = ""
         self.file_label = QLabel('Selected file:')
+        self.pwrpnt_combobox = QComboBox(self)
+        self.pwrpnt_combobox.addItem("Review powerpoint")
+        self.pwrpnt_combobox.addItem("Update powerpoint")
+
         self.load_button = QPushButton('Load PowerPoint File', self)
         self.load_button.clicked.connect(self.load_file)
         self.comments_prompt = QTextEdit()
-        self.comments_prompt.setMinimumHeight(30)
-        self.comments_prompt.setMinimumWidth(200)        
+        self.comments_prompt.setMinimumHeight(90)
+        self.comments_prompt.setMinimumWidth(200) 
+
         self.top_layout = QFormLayout()
         self.top_layout.addWidget(self.load_button)
-        self.top_layout.addWidget(self.file_label)   
+        self.top_layout.addWidget(self.file_label)
+        self.top_layout.addWidget(self.pwrpnt_combobox)   
         self.top_layout.addWidget(self.comments_prompt)     
         self.main_layout.addLayout(self.top_layout)
         self.setmainlayout()
         self.setLayout(self.main_layout)
-        # Initialize prompts attributes
+
         self.comments_prompt.setText("Answer in yes/no fashion with one line justification for the folling questions\n"
                                      "Is the Data Accurate and Consistent?\n"
                                      "Is the Data Presented Clearly and Concisely?\n"
@@ -131,15 +137,10 @@ class ExtendedConfigDialog(ConfigDialog):
         self.user_prompt.setText("content from slide:")
         self.post_prompt.setText("\nEnd of slide content\n\n Please refer to the below report to review the slide content")
 
-    def get_configuration(self):
-        config = json.loads(super().get_configuration())
-        config["extra_field1"] = self.extra_field1.text()
-        config["extra_field2"] = self.extra_field2.text()
-        return json.dumps(config)
-
     def updatecompleteprompt(self):
         tempString = self.user_prompt.toPlainText() + " [Slide Text]" + self.post_prompt.toPlainText() + "\n" + self.additional_input
         self.complete_prompt.setText(tempString)    
+
     
     def load_file(self):
         file_dialog = QFileDialog()
@@ -157,6 +158,8 @@ class ExtendedConfigDialog(ConfigDialog):
         slide_number = 1
         try:
             connection = LLMConnection()
+            connection.initiate_assistant("PowerPoint Iterator",self.system_prompt.toPlainText()) 
+            assistant_output = connection.call_assistant("Here is data for reference:\n\n" + self.additional_input, self.max_tokens_slider.value())                                   
             rollingText = ""
             for ppt_slide in self.ppt_app.Slides:
                 # Extract slide text
@@ -165,8 +168,9 @@ class ExtendedConfigDialog(ConfigDialog):
                     if shape.HasTextFrame:
                         slide_text += shape.TextFrame.TextRange.Text
                 inputText = self.user_prompt.toPlainText() + str(slide_text) + self.post_prompt.toPlainText() +  "\n" + self.additional_input                        
-                response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                outputText = response.choices[0].message.content
+                #response = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+                response = connection.call_assistant(inputText, self.max_tokens_slider.value(),embeddings=self.use_reference_data_checkbox.isChecked())
+                outputText = str(response)
                 if ppt_slide.HasNotesPage:
                     notes_page = ppt_slide.NotesPage
                     notes_shape = notes_page.Shapes.Placeholders[2]  # Placeholder for notes text
@@ -176,8 +180,9 @@ class ExtendedConfigDialog(ConfigDialog):
                     ppt_slide.NotesPage.Shapes.Placeholders[2].TextFrame.TextRange.Text = f"Automated Review:\n{outputText}"
                 # Add the comment with the combined text
                 inputText = self.comments_prompt.toPlainText() + str(slide_text) + self.post_prompt.toPlainText() +  "\n" + self.additional_input                        
-                response_commment = connection.call_prompt(inputText, self.system_prompt.toPlainText(),self.model.text(),self.max_tokens_slider.value())
-                outputText_comment = response_commment.choices[0].message.content
+                response_commment = connection.call_assistant(inputText, self.max_tokens_slider.value(),embeddings=self.use_reference_data_checkbox.isChecked())
+
+                outputText_comment = str(response_commment)
                 comment = ppt_slide.Comments.Add(
                     Left=100,
                     Top=100,
@@ -215,6 +220,6 @@ class ExtendedConfigDialog(ConfigDialog):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    node = PwrPointAdvancedProcessor_Node()
+    node = PwrPointProcessor_Node()
     node.show()
     sys.exit(app.exec())

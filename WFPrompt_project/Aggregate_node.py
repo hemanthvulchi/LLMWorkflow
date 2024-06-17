@@ -1,9 +1,9 @@
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton
 from PySide6.QtCore import Qt
-from node_editor.node import Node
-from node_editor.configdialog import ConfigDialog
-from node_editor.common import Node_Status
+from core.node import Node
+from core.configdialog import ConfigDialog
+from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
 

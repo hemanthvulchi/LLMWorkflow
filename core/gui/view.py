@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtGui, QtOpenGLWidgets, QtWidgets
 
-from node_editor.node import Node
+from core.node import Node
 
 
 class View(QtWidgets.QGraphicsView):

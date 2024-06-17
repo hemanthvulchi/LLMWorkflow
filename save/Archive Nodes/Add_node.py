@@ -1,8 +1,8 @@
 from PySide6 import QtWidgets
-from node_editor.node import Node
-from node_editor.pin import Pin
-from node_editor.connection import Connection
-from node_editor.openaiconnection import OpenAIConnection
+from core.node import Node
+from core.pin import Pin
+from core.connection import Connection
+from core.openaiconnection import OpenAIConnection
 
 class Add_Node(Node):
     def __init__(self):

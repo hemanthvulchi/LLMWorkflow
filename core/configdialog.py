@@ -3,11 +3,12 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton, QComboBox
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem,QStandardItemModel
-from node_editor.node import Node
+from core.node import Node
 from utils.display import Display
 from utils.llmconnection import LLMConnection
 from utils.datamodels import SelectedLLM
 import json
+import traceback
 
 class ConfigDialog(QDialog):
     def __init__(self, config_json, parent=None):
@@ -61,6 +62,9 @@ class ConfigDialog(QDialog):
         self.object_field = QLineEdit(config.get("object", ""))
         self.temparature_field = QLineEdit(config.get("temperature", ""))
 
+        self.use_reference_data_checkbox = QCheckBox("Search Documents for context (stored in Documents folder)")
+
+
         self.advanced_options_checkbox = QCheckBox("Show Advanced Options")
         self.advanced_options_checkbox.stateChanged.connect(self.toggle_advanced_options)
 
@@ -72,6 +76,7 @@ class ConfigDialog(QDialog):
         self.layout.addRow("Response Text:", self.responseAPItext)
         self.layout.addRow("Max Tokens:", self.max_tokens_slider)
         self.layout.addRow("Max Tokens Value:", self.max_tokens_value_label)
+        self.layout.addRow(self.use_reference_data_checkbox)
         self.layout.addRow(self.advanced_options_checkbox)
 
         self.advanced_options_layout = QFormLayout()
@@ -165,12 +170,12 @@ class ConfigDialog(QDialog):
         try:
             connection = LLMConnection()
             complete_prompt = self.user_prompt.toPlainText() + "\n" + self.additional_input
-            response = connection.call_prompt(complete_prompt,self.system_prompt.toPlainText(),self.max_tokens_slider.value())
+            response = connection.call_prompt(complete_prompt,self.system_prompt.toPlainText(),self.max_tokens_slider.value(),embeddings=self.use_reference_data_checkbox.isChecked())
             Display.show_message_box( "Success", "API connection successful!\nResponse: " + str(response))
             self.responseAPItext.setText(str(response))
         except Exception as e:
             print("Error", f"API connection failed!\nError: {str(e)}")
-            Display.show_error_box( "Error", f"API connection failed!\nError: {str(e)}")
+            Display.show_error_box( "Error", f"API connection failed!\nError: {str(e)}\nDetailed Error:{print(traceback.format_exc())}")
 
     def get_configuration(self):
         config = {
