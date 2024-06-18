@@ -14,7 +14,8 @@ import logging
 from pathlib import Path
 import importlib
 import inspect
-
+import chromadb
+from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 from PySide6 import QtCore, QtGui, QtWidgets
 import qdarktheme
 
@@ -194,8 +195,17 @@ if __name__ == "__main__":
         model_selection.select_models()        
         app.setWindowIcon(QtGui.QIcon("resources\\ai.jpg"))
         qdarktheme.setup_theme()
+        print("Setting up environment for database")
+        # client = chromadb.Client(
+        #     settings=Settings(anonymized_telemetry=False),
+        #     tenant=DEFAULT_TENANT,
+        #     database=DEFAULT_DATABASE,
+        # )
+        print("Set ChromaDB client")
         vDB = VectorDB()
+        print("Initialized ChromaDB")
         launcher = NodeEditor()
+        print("Initiated NodeEditor")
         launcher.show()
         app.exec()
     except Exception as e:

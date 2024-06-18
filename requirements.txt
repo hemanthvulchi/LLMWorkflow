@@ -9,4 +9,5 @@ Pandas
 pywin32
 python-pptx
 python-docx
+chromadb
 

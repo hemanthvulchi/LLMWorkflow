@@ -68,7 +68,7 @@ class Input_Node(Node):
         config_json = json.dumps(self.config)
         main_window = QtWidgets.QMainWindow()
         self.dialog = ExtendedConfigDialog(config_json, main_window)
-        self.dialog.setWindowFlags(self.dialog.windowFlags() | Qt.WindowStaysOnTopHint)
+        #self.dialog.setWindowFlags(self.dialog.windowFlags() | Qt.WindowStaysOnTopHint)
         if self.dialog.exec():
             self.config = json.loads(self.dialog.get_configuration())
             self.responsetext.setText(self.config["output"])

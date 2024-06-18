@@ -1,9 +1,11 @@
 from utils import directory as dir
+from chromadb.config import Settings
 import hashlib
 import pickle
 import chromadb
 import os
 import fitz  # PyMuPDF
+import sqlite3
 from pptx import Presentation
 from docx import Document
 
@@ -50,15 +52,36 @@ class ChromaVectorDB:
         self.documents_folder = dir.check_directory("documents")
         self.settings_folder = dir.check_directory("settings")
         self.db_folder = dir.check_directory("db")
-        db_file_path = dir.get_db_filepath(self.db_folder)
+        #self.db_path = self.db_folder + "//"
+        self.db_file_path = dir.get_db_filepath(self.db_folder)
+        print(f"Path for database folder:{self.db_file_path}")
+        #Initialize database so that executable doesnt give an database not found error
+        print("Initializing SQL3 database")
+        #self.initialize_database(self.db_file_path)        
+        print("Checking for existing ChromaDB")
 
-        if os.path.exists(db_file_path):
-            self._client = chromadb.PersistentClient(path=self.db_folder)
+        # try:
+        #     self._client = chromadb.PersistentClient(path=self.db_file_path, settings=Settings(anonymized_telemetry=False))
+        # except sqlite3.OperationalError as e:
+        #     if "no such table: tenants" in str(e):
+        #         print("Database seems to be missing the 'tenants' table. Recreating the database...")
+        #         os.remove(self.db_file_path)  # Remove the old file
+        #         self._client = chromadb.PersistentClient(path=self.db_file_path, settings=Settings(anonymized_telemetry=False))
+        #         self._collection = self._client.create_collection(name="my_collection")
+        #     else:
+        #         raise e  # Re-raise other exceptions
+
+        if os.path.exists(self.db_file_path):            
+            self._client = chromadb.PersistentClient(path=self.db_file_path)
+            #self._client = chromadb.Client()
+            #db =  self._client.connect(self.db_file_path)
+
             self._collection = self._client.get_collection("my_collection")
+            #self._collection = db.collection("my_collection")
             print("Existing database loaded successfully.")
         else:
             print("No database found. New database being loaded...")
-            self._client = chromadb.PersistentClient(path=self.db_folder)
+            self._client = chromadb.PersistentClient(path=self.db_file_path,settings=Settings(anonymized_telemetry=False))
             self._collection = self._client.create_collection(name="my_collection")
 
     def calculate_file_hash(self, file_path):
@@ -186,3 +209,17 @@ class ChromaVectorDB:
     
     def reset_chromaDB(self):
         self._client.reset()
+
+    def initialize_database(self,db_path):
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        # Create the tenants table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS tenants (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+        conn.close()
