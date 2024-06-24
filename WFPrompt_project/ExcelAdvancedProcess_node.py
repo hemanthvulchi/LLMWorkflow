@@ -234,7 +234,7 @@ class ExtendedConfigDialog(ConfigDialog):
         else:
             return None
         
-    def test_api_connection(self):
+    def execute_llm_connection(self):
         if self.selected_file == "":
             Display.show_message_box("Error", "No file selected")
             return None

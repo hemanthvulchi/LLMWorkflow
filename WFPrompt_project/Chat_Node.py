@@ -9,12 +9,12 @@ from utils.llmconnection import LLMConnection
 import json
 
 # Set your OpenAI API key here
-class Meeting_Node(Node):
+class Chat_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title_text = "GenAI Meeting"
-        self.type_text = "Process meeting notes using GenAI"
+        self.title_text = "GenAI Chat"
+        self.type_text = "Chat with AI"
         self.set_color(title_color=(32, 118, 146))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()

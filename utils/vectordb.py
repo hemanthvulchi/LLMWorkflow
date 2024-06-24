@@ -182,6 +182,7 @@ class ChromaVectorDB:
 
 
     def update_chromaDB(self):
+        print("Updating database")
         file_list = self.load_file_list(self.settings_folder)
         current_files = self.scan_documents_folder(self.documents_folder)
 

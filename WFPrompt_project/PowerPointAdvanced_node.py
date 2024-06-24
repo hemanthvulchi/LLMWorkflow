@@ -154,7 +154,7 @@ class ExtendedConfigDialog(ConfigDialog):
 
 
         
-    def test_api_connection(self):
+    def execute_llm_connection(self):
         slide_number = 1
         try:
             connection = LLMConnection()

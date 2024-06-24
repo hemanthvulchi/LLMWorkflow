@@ -31,7 +31,7 @@ from WFPrompt_project.Combine_Node import Combine_Node
 from WFPrompt_project.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
 from WFPrompt_project.ExcelBasicProcess_Node import ExcelBasicProcess_Node
 from WFPrompt_project.Input_Node import Input_Node
-from WFPrompt_project.Meeting_Node import Meeting_Node
+from WFPrompt_project.Chat_Node import Chat_Node
 from WFPrompt_project.PowerPoint_Node import PowerPoint_Node
 from WFPrompt_project.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from WFPrompt_project.Print_Node import Print_Node
@@ -121,7 +121,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
         self.imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
         self.imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__}
-        self.imports['Meeting_Node'] = {"class": Meeting_Node, "module": Meeting_Node.__module__}
+        self.imports['Chat_Node'] = {"class": Chat_Node, "module": Chat_Node.__module__}
         self.imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
         self.imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
         self.imports['Print_Node'] = {"class": Print_Node, "module": Print_Node.__module__}

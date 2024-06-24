@@ -91,7 +91,7 @@ class ConfigDialog(QDialog):
 
         self.test_api_button = QPushButton("Submit Prompt")
         self.test_api_button.setStyleSheet("background-color: blue; color: white;")
-        self.test_api_button.clicked.connect(self.test_api_connection)
+        self.test_api_button.clicked.connect(self.execute_llm_connection)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         
@@ -166,7 +166,7 @@ class ConfigDialog(QDialog):
         max = self.get_model_selected_secondary_value()
         self.max_tokens_slider.setRange(256, int(max))
 
-    def test_api_connection(self):
+    def execute_llm_connection(self):
         try:
             connection = LLMConnection()
             complete_prompt = self.user_prompt.toPlainText() + "\n" + self.additional_input
