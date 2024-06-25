@@ -36,8 +36,9 @@ from WFPrompt_project.PowerPoint_Node import PowerPoint_Node
 from WFPrompt_project.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from WFPrompt_project.Print_Node import Print_Node
 from WFPrompt_project.SimpleInput_Node import SimpleInput_Node
+from WFPrompt_project.SimpleTransform_Node import SimpleTransform_Node
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 
 class NodeEditor(QtWidgets.QMainWindow):
@@ -126,6 +127,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
         self.imports['Print_Node'] = {"class": Print_Node, "module": Print_Node.__module__}
         self.imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__}
+        self.imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__}        
 
         # Update project with the preloaded classes
         self.node_list.update_project(self.imports)

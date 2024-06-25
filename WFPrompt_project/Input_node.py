@@ -10,33 +10,37 @@ import json
 
 # Set your OpenAI API key here
 class Input_Node(Node):
-    def __init__(self):
+    def __init__(self, node_config = {}):
         super().__init__()
-
         self.title_text = "GenAI Input"
         self.type_text = "Process data using GenAI"
         self.set_color(title_color=(32, 118, 146))
         self.pin_output = self.add_pin(name="value", is_output=True)
-        self.build()
+        self.build(node_config)
 
-        self.config = {
-            "user_prompt": "please write a detailed report on the below material",
-            "system_prompt": "You are a security risk professional",
-            "output":"",
-            "max_tokens": 1024,
-            "id": "",
-            "object": "",
-            "temperature": ""
-        }
 
-    def init_widget(self):
+    def init_widget(self, node_config):
+        super().init_widget()        
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "user_prompt": "write your prompt here",
+                "system_prompt": "You are a security risk professional",
+                "output":"",
+                "max_tokens": 1024,
+                "id": "",
+                "object": "",
+                "temperature": ""
+            }    
+        else: 
+            self.config = node_config
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        self.textbox = QTextEdit()
+        self.textbox = QTextEdit(self.config["user_prompt"])
         self.textbox.setFixedHeight(50)
-        self.responsetext = QTextEdit()
+        self.responsetext = QTextEdit(self.config["output"])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""
         QTextEdit{
@@ -60,8 +64,10 @@ class Input_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
+        self.setOuput()
 
-        super().init_widget()
+    def setOuput(self):
+        self.pin_output.set_data(self.config["output"])
 
     def show_configuration(self):
         self.config["user_prompt"] = self.textbox.toPlainText()

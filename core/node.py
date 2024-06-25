@@ -8,6 +8,7 @@ from core.common import Node_Status
 
 class Node(Node_Graphics):
     def __init__(self):
+        print("node init")
         super().__init__()
 
     # Override me
@@ -16,6 +17,13 @@ class Node(Node_Graphics):
 
     def compute(self):
         raise NotImplementedError("compute is not implemented")
+    
+    def getconfig(self):
+        return self.config
+    
+    def setconfig(self,p_config):
+        print("Setting config")
+        self.config = p_config
 
     def execute(self):
         # Get the values from the input pins

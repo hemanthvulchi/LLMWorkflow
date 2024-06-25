@@ -12,15 +12,13 @@ import json
 openai.api_key = "YOUR_OPENAI_API_KEY"
 
 class Combine_Node(Node):
-    def __init__(self):
+    def __init__(self, node_config = {}):
         super().__init__()
-
         self.title_text = "Combine Data"
         self.type_text = "Data would be combined"
         self.set_color(title_color=(44, 110, 96))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
-
         self.pin_A = self.add_pin(name="input A", is_output=False)
         #self.pin_A_end = Pin(None,None)
         self.pin_B = self.add_pin(name="input B", is_output=False)
@@ -30,27 +28,27 @@ class Combine_Node(Node):
         #self.pin_B_end = Pin(None,None)
         self.outpin = self.add_pin(name="output A", is_output=True)
         self.outpin2 = self.add_pin(name="output B", is_output=True)
-        self.build()
+        self.build(node_config)
 
-        self.config = {
-            "user_prompt": "",
-            "system_prompt": "You will be provided with a message, and your task is to write a detailed report.",
-            "output":"",
-            "max_tokens": 1024,
-            "model": "",
-            "id": "",
-            "object": "",
-            "temperature": "",
-            "input1":"",
-            "input2":""
-        }
-
-    def init_widget(self):
+    def init_widget(self, node_config):
+        super().init_widget()        
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "input1":"",
+                "input2":"",
+                "input3":"",
+                "input4":"",    
+                "input5":"",
+                "output":""
+            }
+        else: 
+            self.config = node_config  
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        self.input1text = QTextEdit()
+        self.input1text = QTextEdit(self.config["input1"])
         self.input1text.setFixedHeight(50)
         self.input1text.setStyleSheet("""
         QTextEdit{
@@ -59,7 +57,7 @@ class Combine_Node(Node):
         """)
         self.input1text.setReadOnly(True)
 
-        self.input2text = QTextEdit()
+        self.input2text = QTextEdit(self.config["input2"])
         self.input2text.setFixedHeight(50)
         self.input2text.setStyleSheet("""
         QTextEdit{
@@ -68,7 +66,7 @@ class Combine_Node(Node):
         """)
         self.input2text.setReadOnly(True)
 
-        self.input3text = QTextEdit()
+        self.input3text = QTextEdit(self.config["input3"])
         self.input3text.setFixedHeight(50)
         self.input3text.setStyleSheet("""
         QTextEdit{
@@ -77,7 +75,7 @@ class Combine_Node(Node):
         """)
         self.input3text.setReadOnly(True)
 
-        self.input4text = QTextEdit()
+        self.input4text = QTextEdit(self.config["input4"])
         self.input4text.setFixedHeight(50)
         self.input4text.setStyleSheet("""
         QTextEdit{
@@ -86,7 +84,7 @@ class Combine_Node(Node):
         """)
         self.input4text.setReadOnly(True)
 
-        self.input5text = QTextEdit()
+        self.input5text = QTextEdit(self.config["input5"])
         self.input5text.setFixedHeight(50)
         self.input5text.setStyleSheet("""
         QTextEdit{
@@ -97,7 +95,7 @@ class Combine_Node(Node):
 
         self.textbox = QTextEdit()
         self.textbox.setFixedHeight(50)
-        self.responsetext = QTextEdit()
+        self.responsetext = QTextEdit(self.config["output"])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""
         QTextEdit{
@@ -121,9 +119,11 @@ class Combine_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
+        self.setOuput()
 
-        super().init_widget()
-
+    def setOuput(self):
+        self.outpin.set_data(self.config["output"])
+        self.outpin2.set_data(self.config["output"])
 
     def btn_refresh(self):
         print("Refreshing data")
@@ -155,9 +155,8 @@ class Combine_Node(Node):
             self.input5text.setText(str(self.pin_E.connected_pin.get_data()))
             temptext = temptext + "\n" + str(self.pin_E.connected_pin.get_data())            
 
-
-
         self.responsetext.setText(temptext)
+        self.config["output"] = temptext
         self.outpin.set_data(temptext)
         self.outpin2.set_data(temptext)
         if temptext != "":

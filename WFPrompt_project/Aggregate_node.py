@@ -9,7 +9,7 @@ import json
 
 
 class Aggregate_Node(Node):
-    def __init__(self):
+    def __init__(self,node_config = {}):
         super().__init__()
 
         self.title_text = "GenAI Aggregate"
@@ -23,21 +23,25 @@ class Aggregate_Node(Node):
         self.pin_B = self.add_pin(name="input B", is_output=False)
         #self.pin_B_end = Pin(None,None)
         self.pin_output = self.add_pin(name="output", is_output=True)
-        self.build()
+        self.build(node_config)
 
-        self.config = {
-            "user_prompt": "please write a detailed report on the below material",
-            "system_prompt": "You are a security risk professional",
-            "output":"",
-            "max_tokens": 1024,
-            "id": "",
-            "object": "",
-            "temperature": "",
-            "input1":"",
-            "input2":""
-        }
 
-    def init_widget(self):
+    def init_widget(self, node_config):
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "user_prompt": "please write a detailed report on the below material",
+                "system_prompt": "You are a security risk professional",
+                "output":"",
+                "max_tokens": 1024,
+                "id": "",
+                "object": "",
+                "temperature": "",
+                "input1":"",
+                "input2":""
+                }    
+        else: 
+            self.config = node_config        
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -93,7 +97,10 @@ class Aggregate_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
-        super().init_widget()
+        self.setOuput()
+
+    def setOuput(self):
+        self.pin_output.set_data(self.config["output"])
 
     def show_configuration(self):
         self.btn_refresh()

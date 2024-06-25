@@ -105,7 +105,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
             painter.setBrush(Qt.NoBrush)
             painter.drawPath(self.path)
 
-    def build(self):
+    def build(self,node_config={}):
         """
         Builds the node by constructing its graphical representation.
 
@@ -116,8 +116,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         Returns:
             None.
         """
-
-        self.init_widget()  # configure the widget side of things. We need to get the size of the widget before building the rest of the node
+        self.init_widget(node_config)  # configure the widget side of things. We need to get the size of the widget before building the rest of the node
         self.widget.setStyleSheet("background-color: " + self.node_color.name() + ";")
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
