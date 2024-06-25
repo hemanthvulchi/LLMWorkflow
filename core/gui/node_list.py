@@ -1,7 +1,9 @@
 from PySide6 import QtCore, QtGui, QtWidgets
-import sys
-import importlib
-import inspect
+
+class ListWidgetButton(QtWidgets.QPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+        self.setStyleSheet("QPushButton { margin: 2px; }")
 
 
 class NodeList(QtWidgets.QListWidget):
@@ -23,8 +25,11 @@ class NodeList(QtWidgets.QListWidget):
 
     def mousePressEvent(self, event):
         item = self.itemAt(event.pos())
+        print(item)
+        print(item.text())
         if item and item.text():
             name = item.text()
+            #name = self.itemWidget(item).text()
 
             drag = QtGui.QDrag(self)
             mime_data = QtCore.QMimeData()

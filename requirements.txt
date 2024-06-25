@@ -3,11 +3,11 @@ PySide6
 openai
 google-generativeai
 dotenv
-pymupdf
 Openpyxl
 Pandas
 pywin32
 python-pptx
 python-docx
+pypdf
 chromadb
 

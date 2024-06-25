@@ -26,17 +26,18 @@ from utils.datamodels import ModelSelection
 from core.configdialog import ConfigDialog
 from utils.llmconnection import LLMConnection
 from utils.vectordb import VectorDB
-from WFPrompt_project.Aggregate_Node import Aggregate_Node
-from WFPrompt_project.Combine_Node import Combine_Node
-from WFPrompt_project.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
-from WFPrompt_project.ExcelBasicProcess_Node import ExcelBasicProcess_Node
-from WFPrompt_project.Input_Node import Input_Node
-from WFPrompt_project.Chat_Node import Chat_Node
-from WFPrompt_project.PowerPoint_Node import PowerPoint_Node
-from WFPrompt_project.PowerPointAdvanced_Node import PowerPointAdvanced_Node
-from WFPrompt_project.Print_Node import Print_Node
-from WFPrompt_project.SimpleInput_Node import SimpleInput_Node
-from WFPrompt_project.SimpleTransform_Node import SimpleTransform_Node
+from customnodes.Aggregate_Node import Aggregate_Node
+from customnodes.Combine_Node import Combine_Node
+from customnodes.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
+from customnodes.ExcelBasicProcess_Node import ExcelBasicProcess_Node
+from customnodes.Input_Node import Input_Node
+from customnodes.Chat_Node import Chat_Node
+from customnodes.PowerPoint_Node import PowerPoint_Node
+from customnodes.PowerPointAdvanced_Node import PowerPointAdvanced_Node
+from customnodes.OutputViewer_Node import OutputViewer_Node
+from customnodes.SimpleInput_Node import SimpleInput_Node
+from customnodes.SimpleTransform_Node import SimpleTransform_Node
+from customnodes.File_Extract import FileExtract_Node
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -82,7 +83,25 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         # Widgets
-        self.node_list = NodeList(self)
+        self.input_nodes_label = QtWidgets.QLabel("Input Nodes")
+        self.input_node_list = NodeList(self)
+        self.transform_nodes_label = QtWidgets.QLabel("Transform Nodes")
+        self.transform_node_list = NodeList(self)
+        self.output_nodes_label = QtWidgets.QLabel("Output Nodes")
+        self.output_node_list = NodeList(self)
+
+        #SEt bold font
+        bold_font = QtGui.QFont()
+        bold_font.setBold(True)
+        self.input_nodes_label.setFont(bold_font)
+        self.transform_nodes_label.setFont(bold_font)
+        self.output_nodes_label.setFont(bold_font)
+
+        #Set background of node lists
+        self.input_node_list.setStyleSheet("background: rgb(50, 50, 50);")
+        self.transform_node_list.setStyleSheet("background: rgb(50, 50, 50);")
+        self.output_node_list.setStyleSheet("background: rgb(50, 50, 50);")
+
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
         self.node_widget = NodeWidget(self)
@@ -91,7 +110,12 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
-        left_layout.addWidget(self.node_list)
+        left_layout.addWidget(self.input_nodes_label)
+        left_layout.addWidget(self.input_node_list)
+        left_layout.addWidget(self.transform_nodes_label)
+        left_layout.addWidget(self.transform_node_list)
+        left_layout.addWidget(self.output_nodes_label)
+        left_layout.addWidget(self.output_node_list)        
         main_layout.addWidget(self.splitter)
 
         # Load the example project | need to replace 
@@ -110,28 +134,36 @@ class NodeEditor(QtWidgets.QMainWindow):
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
         file_dialog.setDefaultSuffix("json")
-        file_dialog.setNameFilter("JSON files (*.json)")
-        file_path, _ = file_dialog.getSaveFileName()
-        self.node_widget.save_project(file_path)
+        file_path, _ = file_dialog.getSaveFileName(filter="JSON files (*.json)")
+        if file_path:
+            self.node_widget.save_project(file_path)
 
     def load_project(self,project_path=None):
         # Preloaded classes
         self.imports = {}
-        self.imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
-        self.imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
-        self.imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
-        self.imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
-        self.imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__}
-        self.imports['Chat_Node'] = {"class": Chat_Node, "module": Chat_Node.__module__}
-        self.imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
-        self.imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
-        self.imports['Print_Node'] = {"class": Print_Node, "module": Print_Node.__module__}
-        self.imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__}
-        self.imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__}        
+        self.input_imports = {}
+        self.transform_imports = {}
+        self.output_imports = {}
+        self.input_imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__}
+        self.input_imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__}
+        self.input_imports['FileExtract_Node'] = {"class": FileExtract_Node, "module": FileExtract_Node.__module__}
+        self.transform_imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__}        
+        self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
+        self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
+        self.transform_imports['Chat_Node'] = {"class": Chat_Node, "module": Chat_Node.__module__}
+        self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
+        #self.output_imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
+        #self.output_imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
+        self.output_imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
+        self.output_imports['OutputViewer_Node'] = {"class": OutputViewer_Node, "module": OutputViewer_Node.__module__}
 
         # Update project with the preloaded classes
-        self.node_list.update_project(self.imports)
-
+        self.input_node_list.update_project(self.input_imports)
+        self.transform_node_list.update_project(self.transform_imports)
+        self.output_node_list.update_project(self.output_imports)
+        self.imports.update(self.input_imports)
+        self.imports.update(self.transform_imports)
+        self.imports.update(self.output_imports)
         #old code, where it would dynamically import the classes
             # for file in project_path.glob("*.py"):
 

@@ -2,15 +2,15 @@ from PySide6 import QtWidgets, QtGui
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from core.node import Node
 
-class Print_Node(Node):
+class OutputViewer_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "Print"
-        self.type_text = "Debug Nodes"
+        self.title_text = "Output Viewere"
+        self.type_text = "View ouput"
         self.set_color(title_color=(3, 87, 254))
 
-        self.add_pin(name="Ex In", is_output=False, execution=True)
+        #self.add_pin(name="Ex In", is_output=False, execution=True)
 
         self.pin_A = self.add_pin(name="input", is_output=False)
         self.build(node_config)
@@ -65,10 +65,7 @@ class Print_Node(Node):
         text_area.setText(temptext)
         layout.addWidget(text_area)
 
-        # Add a print button to the dialog
-        print_button = QtWidgets.QPushButton("Print Output")
-        print_button.clicked.connect(lambda: self._print_output(text_area.toPlainText()))
-        layout.addWidget(print_button)
+
 
         # Add a save button to the dialog
         save_button = QtWidgets.QPushButton("Save to File")
@@ -79,6 +76,11 @@ class Print_Node(Node):
         copy_button = QtWidgets.QPushButton("Copy to Clipboard")
         copy_button.clicked.connect(lambda: self._copy_to_clipboard(text_area.toPlainText()))
         layout.addWidget(copy_button)
+
+        # Add a print button to the dialog
+        print_button = QtWidgets.QPushButton("Print Output")
+        print_button.clicked.connect(lambda: self._print_output(text_area.toPlainText()))
+        layout.addWidget(print_button)
 
         dialog.setLayout(layout)
 

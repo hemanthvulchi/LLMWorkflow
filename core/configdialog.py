@@ -95,8 +95,8 @@ class ConfigDialog(QDialog):
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         
-        selfok_button = self.button_box.button(QDialogButtonBox.Ok)
-        selfok_button.setStyleSheet("background-color: green; color: white;")
+        self.ok_button = self.button_box.button(QDialogButtonBox.Ok)
+        self.ok_button.setStyleSheet("background-color: green; color: white;")
         
         self.cancel_button = self.button_box.button(QDialogButtonBox.Cancel)
         self.cancel_button.setStyleSheet("background-color: red; color: white;")
