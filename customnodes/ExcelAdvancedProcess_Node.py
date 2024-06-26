@@ -15,14 +15,14 @@ import traceback
 
 
 class ExcelAdvancedProcess_Node(Node):
-    def __init__(self):
+    def __init__(self,node_config = {}):
         super().__init__()
-        self.title_text = "Excel Advanced Assistant"
-        self.type_text = "Beta: Directly work in excel"
+        self.title_text = "Excel Interface"
+        self.type_text = "Work with Excel"
         self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
-        self.build()
+        self.build(node_config)
 
         self.config = {
             "user_prompt": "please write a detailed report on the below material",
@@ -38,7 +38,23 @@ class ExcelAdvancedProcess_Node(Node):
         # Create a single instance of the ExtendedConfigDialog
         
         
-    def init_widget(self):
+    def init_widget(self, node_config):
+        super().init_widget()        
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "user_prompt": "please write a detailed report on the below material",
+                "system_prompt": "You are a security risk professional",
+                "output":"",
+                "additional_input":"",
+                "max_tokens": 1024,
+                "id": "",
+                "object": "",
+                "temperature": ""
+            }  
+        else: 
+            self.config = node_config
+
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -69,8 +85,6 @@ class ExcelAdvancedProcess_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
-
-        super().init_widget()
 
     def show_configuration(self):
         self.btn_refresh()

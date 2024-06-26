@@ -15,14 +15,14 @@ import json
 
 
 class PowerPointAdvanced_Node(Node):
-    def __init__(self):
+    def __init__(self, node_config = {}):
         super().__init__()
-        self.title_text = "Advanced PowerPoint Assistant"
-        self.type_text = "Directly work in powerpoint"
+        self.title_text = "PowerPoint Interface"
+        self.type_text = "Work with PowerPoint"
         self.set_color(title_color=(0, 119, 182))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
-        self.build()
+        self.build(node_config)
 
         self.config = {
             "user_prompt": "content from slide:",
@@ -39,7 +39,23 @@ class PowerPointAdvanced_Node(Node):
         # Create a single instance of the ExtendedConfigDialog
         
         
-    def init_widget(self):
+    def init_widget(self,node_config):
+        super().init_widget()        
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "user_prompt": "content from slide:",
+                "system_prompt": "You are a security risk professional. You will be presented with slide data" 
+                                " and then reference information,with which you will have to reivew the slide content",
+                "output":"",
+                "additional_input":"",
+                "max_tokens": 1024,
+                "id": "",
+                "object": "",
+                "temperature": ""
+            }  
+        else: 
+            self.config = node_config        
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -70,8 +86,6 @@ class PowerPointAdvanced_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
-
-        super().init_widget()
 
     def show_configuration(self):
         self.btn_refresh()

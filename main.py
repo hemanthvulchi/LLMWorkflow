@@ -22,7 +22,7 @@ import qdarktheme
 from core.gui.node_list import NodeList
 from core.gui.node_widget import NodeWidget
 from utils.display import Display
-from utils.datamodels import ModelSelection
+from utils.datamodels import ModelSelection, SelectedLLM
 from core.configdialog import ConfigDialog
 from utils.llmconnection import LLMConnection
 from utils.vectordb import VectorDB
@@ -38,6 +38,7 @@ from customnodes.OutputViewer_Node import OutputViewer_Node
 from customnodes.SimpleInput_Node import SimpleInput_Node
 from customnodes.SimpleTransform_Node import SimpleTransform_Node
 from customnodes.File_Extract import FileExtract_Node
+from customnodes.TransformLLM_Node import TransformLLM_Node
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -67,7 +68,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         save_action.triggered.connect(self.save_project)
         file_menu.addAction(save_action)
 
-        reference_menu = QtWidgets.QMenu("Reference Files", self)
+        reference_menu = QtWidgets.QMenu("Reference Files (RAG)", self)
         self.menuBar().addMenu(reference_menu)
         updateDB_action = QtGui.QAction("Update Database", self)
         updateDB_action.triggered.connect(self.update_vectorDB)
@@ -89,6 +90,10 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.transform_node_list = NodeList(self)
         self.output_nodes_label = QtWidgets.QLabel("Output Nodes")
         self.output_node_list = NodeList(self)
+        self.connection_label = QtWidgets.QLabel("Selected LLM")
+        self.connectionText = QtWidgets.QTextEdit()
+        self.model_label = QtWidgets.QLabel("Selected Model")
+        self.modelText = QtWidgets.QTextEdit()
 
         #SEt bold font
         bold_font = QtGui.QFont()
@@ -96,11 +101,32 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.input_nodes_label.setFont(bold_font)
         self.transform_nodes_label.setFont(bold_font)
         self.output_nodes_label.setFont(bold_font)
+        self.connection_label.setFont(bold_font)
+        self.model_label.setFont(bold_font)
 
         #Set background of node lists
         self.input_node_list.setStyleSheet("background: rgb(50, 50, 50);")
         self.transform_node_list.setStyleSheet("background: rgb(50, 50, 50);")
         self.output_node_list.setStyleSheet("background: rgb(50, 50, 50);")
+
+
+        self.connectionText.setPlainText("TBD")
+        self.connectionText.setFixedHeight(30)
+        self.connectionText.setStyleSheet("""
+        QTextEdit{
+        background: rgb(100, 100, 100); /*background color */
+        }
+        """)
+        self.connectionText.setReadOnly(True)
+
+        self.modelText.setPlainText("TBD")
+        self.modelText.setFixedHeight(30)
+        self.modelText.setStyleSheet("""
+        QTextEdit{
+        background: rgb(100, 100, 100); /*background color */
+        }
+        """)
+        self.modelText.setReadOnly(True)
 
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
@@ -110,12 +136,17 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
+        left_layout.addWidget(self.connection_label)
+        left_layout.addWidget(self.connectionText)        
+        left_layout.addWidget(self.model_label)
+        left_layout.addWidget(self.modelText)           
         left_layout.addWidget(self.input_nodes_label)
         left_layout.addWidget(self.input_node_list)
         left_layout.addWidget(self.transform_nodes_label)
         left_layout.addWidget(self.transform_node_list)
         left_layout.addWidget(self.output_nodes_label)
-        left_layout.addWidget(self.output_node_list)        
+        left_layout.addWidget(self.output_node_list)    
+              
         main_layout.addWidget(self.splitter)
 
         # Load the example project | need to replace 
@@ -129,6 +160,12 @@ class NodeEditor(QtWidgets.QMainWindow):
 
             s = settings.value("splitterSize")
             self.splitter.restoreState(s)
+
+    def setLLM(self,textLLM):
+        self.connectionText.setPlainText(textLLM)
+
+    def setModel(self,textModel):
+        self.modelText.setPlainText(textModel)
 
     def save_project(self):
         file_dialog = QtWidgets.QFileDialog()
@@ -149,6 +186,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.input_imports['FileExtract_Node'] = {"class": FileExtract_Node, "module": FileExtract_Node.__module__}
         self.transform_imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__}        
         self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
+        self.transform_imports['TransformLLM_Node'] = {"class": TransformLLM_Node, "module": TransformLLM_Node.__module__}
         self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
         self.transform_imports['Chat_Node'] = {"class": Chat_Node, "module": Chat_Node.__module__}
         self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
@@ -230,16 +268,14 @@ if __name__ == "__main__":
         app.setWindowIcon(QtGui.QIcon("resources\\ai.jpg"))
         qdarktheme.setup_theme()
         print("Setting up environment for database")
-        # client = chromadb.Client(
-        #     settings=Settings(anonymized_telemetry=False),
-        #     tenant=DEFAULT_TENANT,
-        #     database=DEFAULT_DATABASE,
-        # )
         print("Set ChromaDB client")
         vDB = VectorDB()
         print("Initialized ChromaDB")
         launcher = NodeEditor()
+        sLLM = SelectedLLM()
         print("Initiated NodeEditor")
+        launcher.setLLM(sLLM.selected_company)
+        launcher.setModel(sLLM.selected_model)
         launcher.show()
         app.exec()
     except Exception as e:

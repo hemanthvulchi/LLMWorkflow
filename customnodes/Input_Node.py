@@ -38,9 +38,11 @@ class Input_Node(Node):
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        self.textbox = QTextEdit(self.config["user_prompt"])
+        self.textbox = QTextEdit()
+        self.textbox.setPlainText(self.config["user_prompt"])
         self.textbox.setFixedHeight(50)
-        self.responsetext = QTextEdit(self.config["output"])
+        self.responsetext = QTextEdit()
+        self.responsetext.setPlainText(self.config["output"])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""
         QTextEdit{

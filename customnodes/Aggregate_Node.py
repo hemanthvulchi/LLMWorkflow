@@ -47,6 +47,7 @@ class Aggregate_Node(Node):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.input1text = QTextEdit()
+        #self.input1text.setPlainText(self.config["input1"])
         self.input1text.setFixedHeight(50)
         self.input1text.setStyleSheet("""
         QTextEdit{
@@ -56,6 +57,7 @@ class Aggregate_Node(Node):
         self.input1text.setReadOnly(True)
 
         self.input2text = QTextEdit()
+        #self.input2text.setPlainText(self.config["input2"])
         self.input2text.setFixedHeight(50)
         self.input2text.setStyleSheet("""
         QTextEdit{
@@ -67,6 +69,7 @@ class Aggregate_Node(Node):
         self.textbox = QTextEdit()
         self.textbox.setFixedHeight(50)
         self.responsetext = QTextEdit()
+        self.responsetext.setPlainText(self.config["output"])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""
         QTextEdit{
@@ -150,6 +153,7 @@ class ExtendedConfigDialog(ConfigDialog):
         self.setmainlayout()
         self.setLayout(self.main_layout)
         self.post_prompt.setVisible(False)
+        #self.user_prompt.setPlainText(self.config)
         #self.additional_input = 
 
     def updatecompleteprompt(self):

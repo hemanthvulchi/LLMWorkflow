@@ -28,7 +28,8 @@ class FileExtract_Node(Node):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.filetextbox = QTextEdit(self.config["output"])
+        self.filetextbox = QTextEdit()
+        self.filetextbox.setPlainText(self.config["output"])
         self.filetextbox.setMinimumHeight(200)
         self.filetextbox.setMinimumWidth(100)
         self.filetextbox.setStyleSheet("""
@@ -50,9 +51,9 @@ class FileExtract_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
-        self.setOuput()
+        self.setOutput()
 
-    def setOuput(self):
+    def setOutput(self):
         self.pin_output.set_data(self.config["output"])
 
     

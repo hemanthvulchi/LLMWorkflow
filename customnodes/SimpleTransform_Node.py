@@ -28,9 +28,10 @@ class SimpleTransform_Node(Node):
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        self.textbox = QtWidgets.QTextEdit(self.config["input_prompt"])
-        self.textbox.setMinimumHeight(200)
-        self.textbox.setMinimumWidth(100)
+        self.textbox = QtWidgets.QTextEdit()
+        self.textbox.setPlainText(self.config["input_prompt"])
+        self.textbox.setFixedHeight(50)
+        self.textbox.setMinimumWidth(50)
         self.textbox.textChanged.connect(self.inputupdated)
 
         self.btnRefresh = QtWidgets.QPushButton("Clear and Refresh")
@@ -75,8 +76,8 @@ class SimpleTransform_Node(Node):
         # Create and configure the dialog box
         dialog = QtWidgets.QDialog(self.scene().views()[0])  # Parent to the main window
         dialog.setWindowTitle("Edit Data")
-        dialog.setMinimumWidth(400)
-        dialog.setMinimumHeight(200)
+        dialog.setMinimumWidth(600)
+        dialog.setMinimumHeight(400)
         dialog.setModal(True)  # Make it modal to grab focus
 
         layout = QtWidgets.QVBoxLayout()
