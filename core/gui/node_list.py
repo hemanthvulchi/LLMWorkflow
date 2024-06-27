@@ -1,4 +1,5 @@
 from PySide6 import QtCore, QtGui, QtWidgets
+import utils.themecolors as colors
 
 class ListWidgetButton(QtWidgets.QPushButton):
     def __init__(self, text):
@@ -21,6 +22,16 @@ class NodeList(QtWidgets.QListWidget):
             item.module = data["module"]
             item.class_name = data["class"]
             self.addItem(item)
+        
+        self.setStyleSheet(f"""
+            QListWidget::item {{
+                border: 1px solid {colors.get_color_hex('border')};
+                background: rgb(75, 75, 75)
+                margin: 5px;
+                padding: 5px;
+                border-radius: 10px;                           
+            }}
+            """)
 
 
     def mousePressEvent(self, event):

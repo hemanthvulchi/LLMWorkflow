@@ -6,6 +6,7 @@ from core.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
+import utils.themecolors as colors
 
 
 class TransformLLM_Node(Node):

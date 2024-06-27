@@ -5,6 +5,7 @@ from core.node import Node
 from core.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
+import utils.themecolors as colors
 import json
 
 
@@ -14,7 +15,7 @@ class Aggregate_Node(Node):
 
         self.title_text = "GenAI Aggregate"
         self.type_text = "Data to be entered"
-        self.set_color(title_color=(44, 110, 96))
+        self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
 

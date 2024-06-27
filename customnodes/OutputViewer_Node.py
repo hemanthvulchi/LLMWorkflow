@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from core.node import Node
+import utils.themecolors as colors
 
 class OutputViewer_Node(Node):
     def __init__(self, node_config = {}):
@@ -8,7 +9,7 @@ class OutputViewer_Node(Node):
 
         self.title_text = "Output Viewere"
         self.type_text = "View ouput"
-        self.set_color(title_color=(3, 87, 254))
+        self.set_color(colors.get_color_rgb("output"))
 
         #self.add_pin(name="Ex In", is_output=False, execution=True)
 

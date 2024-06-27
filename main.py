@@ -37,8 +37,9 @@ from customnodes.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from customnodes.OutputViewer_Node import OutputViewer_Node
 from customnodes.SimpleInput_Node import SimpleInput_Node
 from customnodes.SimpleTransform_Node import SimpleTransform_Node
-from customnodes.File_Extract import FileExtract_Node
+from customnodes.FileExtract_Node import FileExtract_Node
 from customnodes.TransformLLM_Node import TransformLLM_Node
+import utils.themecolors as colors
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -98,16 +99,56 @@ class NodeEditor(QtWidgets.QMainWindow):
         #SEt bold font
         bold_font = QtGui.QFont()
         bold_font.setBold(True)
-        self.input_nodes_label.setFont(bold_font)
-        self.transform_nodes_label.setFont(bold_font)
-        self.output_nodes_label.setFont(bold_font)
         self.connection_label.setFont(bold_font)
         self.model_label.setFont(bold_font)
+        self.input_nodes_label.setFont(bold_font)
+        self.input_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.input_nodes_label.setStyleSheet(f"""
+            background-color: {colors.get_color_hex('input')}; 
+            color: white;               /* White text color */
+            border: 2px solid {colors.get_color_hex('input')};  
+            border-radius: 10px;        /* Rounded corners */
+            padding: 10px;              /* Padding inside the label */
+            """)        
+        self.transform_nodes_label.setFont(bold_font)
+        self.transform_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.transform_nodes_label.setStyleSheet(f"""
+            background-color: {colors.get_color_hex('transform')}; 
+            color: white;               /* White text color */
+            border: 2px solid {colors.get_color_hex('transform')};  
+            border-radius: 10px;        /* Rounded corners */
+            padding: 10px;              /* Padding inside the label */
+            """)        
+        self.output_nodes_label.setFont(bold_font)
+        self.output_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.output_nodes_label.setStyleSheet(f"""
+            background-color: {colors.get_color_hex('output')};  
+            color: white;               /* White text color */
+            border: 2px solid {colors.get_color_hex('output')};  
+            border-radius: 10px;        /* Rounded corners */
+            padding: 10px;              /* Padding inside the label */
+        """)        
+
 
         #Set background of node lists
-        self.input_node_list.setStyleSheet("background: rgb(50, 50, 50);")
-        self.transform_node_list.setStyleSheet("background: rgb(50, 50, 50);")
-        self.output_node_list.setStyleSheet("background: rgb(50, 50, 50);")
+        self.input_node_list.setStyleSheet(f"""
+            background: rgb(50, 50, 50);
+            color: white;               
+            border: 2px solid {colors.get_color_hex("input")};         
+            padding: 10px;             
+            """)
+        self.transform_node_list.setStyleSheet(f"""
+            background: rgb(50, 50, 50);
+            color: white;               
+            border: 2px solid {colors.get_color_hex("transform")};  
+            padding: 10px;             
+            """)        
+        self.output_node_list.setStyleSheet(f"""
+            background: rgb(50, 50, 50);
+            color: white;               
+            border: 2px solid {colors.get_color_hex("output")};  
+            padding: 10px;             
+            """)        
 
 
         self.connectionText.setPlainText("TBD")

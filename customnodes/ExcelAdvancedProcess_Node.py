@@ -7,6 +7,7 @@ from openpyxl.utils import range_boundaries, get_column_letter
 from utils.display import Display
 from utils.llmconnection import LLMConnection
 from utils.datamodels import SelectedLLM
+import utils.themecolors as colors
 import openpyxl
 import pandas as pd
 import json
@@ -19,7 +20,7 @@ class ExcelAdvancedProcess_Node(Node):
         super().__init__()
         self.title_text = "Excel Interface"
         self.type_text = "Work with Excel"
-        self.set_color(title_color=(0, 119, 182))
+        self.set_color(colors.get_color_rgb("output"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build(node_config)

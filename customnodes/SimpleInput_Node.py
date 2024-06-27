@@ -2,6 +2,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
 from core.common import Node_Status
 from core.node import Node
+import utils.themecolors as colors
 from customnodes.common_widgets import FloatLineEdit
 
 
@@ -11,7 +12,7 @@ class SimpleInput_Node(Node):
 
         self.title_text = "Simple Input"
         self.type_text = "Just Add Simple Input"
-        self.set_color(title_color=(32, 118, 146))
+        self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 

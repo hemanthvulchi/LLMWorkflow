@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QTextEdit
 from core.common import Node_Status
 from core.node import Node
 import utils.documents.fileextract as fex
+import utils.themecolors as colors
 import os
 
 class FileExtract_Node(Node):
@@ -11,7 +12,7 @@ class FileExtract_Node(Node):
 
         self.title_text = "FileExtract"
         self.type_text = "ExtractFile"
-        self.set_color(title_color=(32, 118, 146))
+        self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 

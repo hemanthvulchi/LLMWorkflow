@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from core.node import Node
 from core.common import Node_Status
+import utils.themecolors as colors
 import openai
 import json
 
@@ -16,7 +17,7 @@ class Combine_Node(Node):
         super().__init__()
         self.title_text = "Combine Data"
         self.type_text = "Data would be combined"
-        self.set_color(title_color=(44, 110, 96))
+        self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)

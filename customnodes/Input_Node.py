@@ -6,6 +6,7 @@ from core.node import Node
 from core.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
+import utils.themecolors as colors
 import json
 
 # Set your OpenAI API key here
@@ -14,7 +15,7 @@ class Input_Node(Node):
         super().__init__()
         self.title_text = "GenAI Input"
         self.type_text = "Process data using GenAI"
-        self.set_color(title_color=(32, 118, 146))
+        self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 

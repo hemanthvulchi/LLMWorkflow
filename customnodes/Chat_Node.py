@@ -7,6 +7,7 @@ from core.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
+import utils.themecolors as colors
 
 # Set your OpenAI API key here
 class Chat_Node(Node):
@@ -15,7 +16,7 @@ class Chat_Node(Node):
 
         self.title_text = "WIP: GenAI Chat"
         self.type_text = "WORK IN PROGRESS: Chat with AI"
-        self.set_color(title_color=(32, 118, 146))
+        self.set_color(colors.get_color_rgb("transform"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()
 
