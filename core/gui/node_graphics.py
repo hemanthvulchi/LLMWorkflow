@@ -2,6 +2,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from core.common import Node_Status
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
+from utils import directory
 
 
 class Node_Graphics(QtWidgets.QGraphicsItem):
@@ -71,7 +72,6 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
             option (QStyleOptionGraphicsItem): The style options to use for drawing the node (optional).
             widget (QWidget): The widget to use for drawing the node (optional).
         """
-
         painter.setPen(self.node_color.lighter())
         painter.setBrush(self.node_color)
         painter.drawPath(self.path)
@@ -178,9 +178,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         # Draw the status rectangle
         self.status_path.setFillRule(Qt.WindingFill)
         self.status_path.addRoundedRect(total_width / 2 - 30, -total_height / 2 + 2, 25, 10, 2, 2)
-        # self.status_path.addRect(total_width / 2 - 10, -total_height / 2, 5, 5)
-        # self.status_path.addRect(total_width / 2 - 10, -total_height / 2 + 15, 5, 5)
-        # self.status_path.addRect(total_width / 2 - 5, -total_height / 2 + 15, 5, 5)
+  
 
         # The color on the title
         self.title_bg_path = QtGui.QPainterPath()  # The title background path
@@ -236,6 +234,28 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         self._width = total_width
         self._height = total_height
+        currentFolderPath = directory.get_current_directory()
+
+        # Load the settings icon from the resource file
+        settings_icon = QtGui.QIcon(":/resources/settings.png")  # Assuming "settings.png" is in the "icons" folder within your resource file
+        
+        # Create a button for the settings icon
+        settings_button = QtWidgets.QPushButton(self.widget)
+        settings_button.setIcon(settings_icon)
+        settings_button.setIconSize(QtCore.QSize(20, 20))  # Adjust size as needed
+        settings_button.setFixedSize(24, 24)  # Adjust size as needed
+        settings_button.setStyleSheet("background-color: transparent; border: none;")
+
+        # Position the settings button (top right corner)
+        settings_button.move(total_width / 2 - 30, -total_height / 2 + 5) 
+
+        # Connect the settings button to a function (if needed)
+        settings_button.clicked.connect(self.on_settings_clicked)  # Replace with your function
+
 
         # move the widget to the bottom
         self.widget.move(-self.widget.size().width() / 2, total_height / 2 - self.widget.size().height() + 5)
+
+    def on_settings_clicked(self):
+        # Implement the action you want when the settings button is clicked
+        print("Settings button clicked!")

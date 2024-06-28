@@ -143,21 +143,27 @@ class ChromaVectorDB:
         print("Updating database")
         file_list = self.load_file_list(self.settings_folder)
         current_files = self.scan_documents_folder(self.documents_folder)
-
+        file_list_string = ""
         for file_path, file_hash in current_files.items():
             if file_path not in file_list or file_list[file_path] != file_hash:
                 file_list[file_path] = file_hash
                 self.add_document_collection(file_path)
+                file_list_string =  file_list_string  + '\nFile Added: ' + file_path
 
         for file_path in list(file_list.keys()):
             if file_path not in current_files:
                 del file_list[file_path]
                 self.remove_document_collection(file_path)
+                file_list_string =  file_list_string  + '\nFile Removed: ' + file_path
 
         self.save_file_list(file_list, self.settings_folder)
         print("List of files in vectorDB")
+        file_list_string =  file_list_string  + '\nList of current files: '
         for file_path in file_list:
-            print(file_path, dir.get_current_directory())
+            print(file_path)
+            file_list_string =  file_list_string  + '\n' + file_path
+        
+        return file_list_string
 
     #need to check if the collection should be recreated
     def reload_chromaDB(self):

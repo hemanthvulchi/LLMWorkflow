@@ -23,7 +23,7 @@ from core.gui.node_list import NodeList
 from core.gui.node_widget import NodeWidget
 from utils.display import Display
 from utils.datamodels import ModelSelection, SelectedLLM
-from core.configdialog import ConfigDialog
+from customnodes.common_widgets.configdialog import ConfigDialog
 from utils.llmconnection import LLMConnection
 from utils.vectordb import VectorDB
 from customnodes.Aggregate_Node import Aggregate_Node
@@ -39,6 +39,7 @@ from customnodes.SimpleInput_Node import SimpleInput_Node
 from customnodes.SimpleTransform_Node import SimpleTransform_Node
 from customnodes.FileExtract_Node import FileExtract_Node
 from customnodes.TransformLLM_Node import TransformLLM_Node
+from customnodes.Test_Node import Test_Node
 import utils.themecolors as colors
 
 #logging.basicConfig(level=logging.DEBUG)
@@ -53,11 +54,16 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.project_path = None
         self.imports = None  # we will store the project import node types here for now.
 
-
         self.setWindowTitle("Visual Prompt Engineering")
-        settings = QtCore.QSettings("node-editor", "NodeEditor")
+        self.settings = QtCore.QSettings("node-editor", "NodeEditor")
 
-        # create a "File" menu and add an "Export CSV" action to it
+        self.init_menu()
+        self.init_ui()
+        self.load_initial_project()
+        self.restore_last_state()
+
+    def init_menu(self):
+        # Create a "File" menu and add actions to it
         file_menu = QtWidgets.QMenu("File", self)
         self.menuBar().addMenu(file_menu)
 
@@ -69,13 +75,15 @@ class NodeEditor(QtWidgets.QMainWindow):
         save_action.triggered.connect(self.save_project)
         file_menu.addAction(save_action)
 
+        # Create a "Reference Files (RAG)" menu and add actions to it
         reference_menu = QtWidgets.QMenu("Reference Files (RAG)", self)
         self.menuBar().addMenu(reference_menu)
+        
         updateDB_action = QtGui.QAction("Update Database", self)
         updateDB_action.triggered.connect(self.update_vectorDB)
         reference_menu.addAction(updateDB_action)
-        
 
+    def init_ui(self):
         # Layouts
         main_widget = QtWidgets.QWidget()
         self.setCentralWidget(main_widget)
@@ -85,89 +93,9 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         # Widgets
-        self.input_nodes_label = QtWidgets.QLabel("Input Nodes")
-        self.input_node_list = NodeList(self)
-        self.transform_nodes_label = QtWidgets.QLabel("Transform Nodes")
-        self.transform_node_list = NodeList(self)
-        self.output_nodes_label = QtWidgets.QLabel("Output Nodes")
-        self.output_node_list = NodeList(self)
-        self.connection_label = QtWidgets.QLabel("Selected LLM")
-        self.connectionText = QtWidgets.QTextEdit()
-        self.model_label = QtWidgets.QLabel("Selected Model")
-        self.modelText = QtWidgets.QTextEdit()
-
-        #SEt bold font
-        bold_font = QtGui.QFont()
-        bold_font.setBold(True)
-        self.connection_label.setFont(bold_font)
-        self.model_label.setFont(bold_font)
-        self.input_nodes_label.setFont(bold_font)
-        self.input_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.input_nodes_label.setStyleSheet(f"""
-            background-color: {colors.get_color_hex('input')}; 
-            color: white;               /* White text color */
-            border: 2px solid {colors.get_color_hex('input')};  
-            border-radius: 10px;        /* Rounded corners */
-            padding: 10px;              /* Padding inside the label */
-            """)        
-        self.transform_nodes_label.setFont(bold_font)
-        self.transform_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.transform_nodes_label.setStyleSheet(f"""
-            background-color: {colors.get_color_hex('transform')}; 
-            color: white;               /* White text color */
-            border: 2px solid {colors.get_color_hex('transform')};  
-            border-radius: 10px;        /* Rounded corners */
-            padding: 10px;              /* Padding inside the label */
-            """)        
-        self.output_nodes_label.setFont(bold_font)
-        self.output_nodes_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.output_nodes_label.setStyleSheet(f"""
-            background-color: {colors.get_color_hex('output')};  
-            color: white;               /* White text color */
-            border: 2px solid {colors.get_color_hex('output')};  
-            border-radius: 10px;        /* Rounded corners */
-            padding: 10px;              /* Padding inside the label */
-        """)        
-
-
-        #Set background of node lists
-        self.input_node_list.setStyleSheet(f"""
-            background: rgb(50, 50, 50);
-            color: white;               
-            border: 2px solid {colors.get_color_hex("input")};         
-            padding: 10px;             
-            """)
-        self.transform_node_list.setStyleSheet(f"""
-            background: rgb(50, 50, 50);
-            color: white;               
-            border: 2px solid {colors.get_color_hex("transform")};  
-            padding: 10px;             
-            """)        
-        self.output_node_list.setStyleSheet(f"""
-            background: rgb(50, 50, 50);
-            color: white;               
-            border: 2px solid {colors.get_color_hex("output")};  
-            padding: 10px;             
-            """)        
-
-
-        self.connectionText.setPlainText("TBD")
-        self.connectionText.setFixedHeight(30)
-        self.connectionText.setStyleSheet("""
-        QTextEdit{
-        background: rgb(100, 100, 100); /*background color */
-        }
-        """)
-        self.connectionText.setReadOnly(True)
-
-        self.modelText.setPlainText("TBD")
-        self.modelText.setFixedHeight(30)
-        self.modelText.setStyleSheet("""
-        QTextEdit{
-        background: rgb(100, 100, 100); /*background color */
-        }
-        """)
-        self.modelText.setReadOnly(True)
+        self.init_connection_widgets()
+        self.init_labels()
+        self.init_node_lists()
 
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
@@ -177,30 +105,139 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
+        
+        connection_layout = QtWidgets.QHBoxLayout()
+        connection_layout.addWidget(self.connection_label)
+        connection_layout.addWidget(self.connectionText)
+        left_layout.addLayout(connection_layout)
+        
+        model_layout = QtWidgets.QHBoxLayout()
+        model_layout.addWidget(self.model_label)
+        model_layout.addWidget(self.modelText)
+        left_layout.addLayout(model_layout)
+
         left_layout.addWidget(self.connection_label)
         left_layout.addWidget(self.connectionText)        
         left_layout.addWidget(self.model_label)
-        left_layout.addWidget(self.modelText)           
-        left_layout.addWidget(self.input_nodes_label)
-        left_layout.addWidget(self.input_node_list)
-        left_layout.addWidget(self.transform_nodes_label)
-        left_layout.addWidget(self.transform_node_list)
-        left_layout.addWidget(self.output_nodes_label)
-        left_layout.addWidget(self.output_node_list)    
+        left_layout.addWidget(self.modelText)  
+        left_layout.addWidget(self.nodes_label)         
+        left_layout.addWidget(self.input_nodes_group)
+        left_layout.addWidget(self.transform_nodes_group)
+        left_layout.addWidget(self.output_nodes_group)   
               
         main_layout.addWidget(self.splitter)
 
-        # Load the example project | need to replace 
-        #load_project_path = (Path(__file__).parent.resolve() / 'Example_project')
+    def init_connection_widgets(self):
+        # Initialize connection text widgets with styles
+        self.connectionText = self.create_text_edit()
+        self.modelText = self.create_text_edit()
+
+    def init_labels(self):
+        # Initialize labels with styles
+        custom_font = QtGui.QFont()
+        custom_font.setBold(True)
+        self.connection_label = self.create_label("Selected LLM", custom_font)
+        self.model_label = self.create_label("Selected Model", custom_font)
+        custom_font = QtGui.QFont()
+        custom_font.setBold(True)
+        custom_font.setUnderline(True)
+        self.nodes_label = self.create_label("Nodes (Drag and Drop)", custom_font)
+
+    def init_node_lists(self):
+        # Initialize node lists with styles
+        self.input_node_list = NodeList(self)
+        self.transform_node_list = NodeList(self)
+        self.output_node_list = NodeList(self)
+
+        self.input_node_list.setStyleSheet(self.get_node_list_style(colors.get_color_hex("input")))
+        self.transform_node_list.setStyleSheet(self.get_node_list_style(colors.get_color_hex("transform")))
+        self.output_node_list.setStyleSheet(self.get_node_list_style(colors.get_color_hex("output")))
+
+        # Create groups with headers
+        self.input_nodes_group = self.create_group_box("Input Nodes", self.input_node_list, colors.get_color_hex("input"))
+        self.transform_nodes_group = self.create_group_box("Transform Nodes",self.transform_node_list, colors.get_color_hex("transform"))
+        self.output_nodes_group = self.create_group_box("Output Nodes", self.output_node_list, colors.get_color_hex("output"))
+
+
+    def create_label(self, text, font, color=None):
+        label = QtWidgets.QLabel(text)
+        label.setFont(font)
+        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        if color:
+            label.setStyleSheet(f"""
+                background-color: {color}; 
+                color: white;               
+                border: 2px solid {color};  
+                border-radius: 10px;        
+                padding: 10px;                             
+            """)
+        return label
+
+    def create_text_edit(self):
+        text_edit = QtWidgets.QTextEdit()
+        text_edit.setPlainText("TBD")
+        text_edit.setFixedHeight(30)
+        text_edit.setStyleSheet("""
+            QTextEdit{
+            background: rgb(100, 100, 100); 
+            }
+        """)
+        text_edit.setReadOnly(True)
+        return text_edit
+
+    def get_node_list_style(self, color):
+        return f"""
+                QListWidget {{
+                    background: rgb(50, 50, 50);
+                    color: white;               
+                    border: 1px solid {colors.get_color_hex('border')};         
+                    padding: 10px;             
+                }}
+
+                QListWidget::item {{
+                    border: 1px solid {color};
+                    background: rgb(75, 75, 75);
+                    margin: 2px;
+                    padding: 1px;
+                    border-radius: 10px;            
+                }}
+                """
+
+    def create_group_box(self, title, widget, color):
+        group_box = QtWidgets.QGroupBox(title)
+        # font = group_box.font()
+        # font.setPointSize(10)  # Set font size
+        # group_box.setFont(font)        
+        group_box.setStyleSheet(f"""
+            QGroupBox {{
+                border: 2px solid {colors.get_color_hex('border')};
+                border-radius: 5px;
+                margin-top: 10px;
+            }}
+            QGroupBox::title {{
+                color: {color};
+                subcontrol-origin: margin;
+                subcontrol-position: top left; 
+                padding: 0 3px;
+                font-size: 24px;
+            }}
+        """)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(widget)
+        group_box.setLayout(layout)
+        return group_box
+
+
+    def load_initial_project(self):
         load_project_path = (Path(__file__).parent.resolve())
         self.load_project(load_project_path)
 
-        # Restore GUI from last state
-        if settings.contains("geometry"):
-            self.restoreGeometry(settings.value("geometry"))
-
-            s = settings.value("splitterSize")
+    def restore_last_state(self):
+        if self.settings.contains("geometry"):
+            self.restoreGeometry(self.settings.value("geometry"))
+            s = self.settings.value("splitterSize")
             self.splitter.restoreState(s)
+
 
     def setLLM(self,textLLM):
         self.connectionText.setPlainText(textLLM)
@@ -229,7 +266,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
         self.transform_imports['TransformLLM_Node'] = {"class": TransformLLM_Node, "module": TransformLLM_Node.__module__}
         self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
-        self.transform_imports['Chat_Node'] = {"class": Chat_Node, "module": Chat_Node.__module__}
+        self.transform_imports['Test_Node'] = {"class": Test_Node, "module": Test_Node.__module__}
         self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
         #self.output_imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
         #self.output_imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
@@ -276,7 +313,8 @@ class NodeEditor(QtWidgets.QMainWindow):
 
     def update_vectorDB(self):
         vDB = VectorDB()
-        vDB.update_db()
+        response = vDB.update_db()
+        Display.show_message_box( "Success", "Document database refreshed\n " + str(response))
 
     def closeEvent(self, event):
         """

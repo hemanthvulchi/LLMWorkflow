@@ -2,7 +2,6 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
 from core.common import Node_Status
 from core.node import Node
-from customnodes.common_widgets import FloatLineEdit
 import utils.themecolors as colors
 
 

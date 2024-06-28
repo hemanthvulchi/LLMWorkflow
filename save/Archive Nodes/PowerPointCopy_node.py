@@ -4,7 +4,7 @@ import traceback
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QFormLayout
 from core.node import Node
-from core.configdialog import ConfigDialog
+from customnodes.common_widgets.configdialog import ConfigDialog
 from utils.display import Display
 from utils.llmconnection import LLMConnection
 from pptx.util import Inches

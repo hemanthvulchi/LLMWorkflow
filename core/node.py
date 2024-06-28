@@ -8,7 +8,6 @@ from core.common import Node_Status
 
 class Node(Node_Graphics):
     def __init__(self):
-        print("node init")
         super().__init__()
 
     # Override me

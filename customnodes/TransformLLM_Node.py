@@ -2,7 +2,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton
 from PySide6.QtCore import Qt
 from core.node import Node
-from core.configdialog import ConfigDialog
+from customnodes.common_widgets.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
@@ -30,7 +30,7 @@ class TransformLLM_Node(Node):
                 "output":"",
                 "max_tokens": 1024,
                 "id": "",
-                "object": "",
+                "properties": "",
                 "temperature": "",
                 "input1":""
                 }    

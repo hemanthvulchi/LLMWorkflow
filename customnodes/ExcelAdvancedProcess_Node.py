@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from core.node import Node
-from core.configdialog import ConfigDialog
+from customnodes.common_widgets.configdialog import ConfigDialog
 from core.common import Node_Status
 from openpyxl.utils import range_boundaries, get_column_letter
 from utils.display import Display
@@ -25,16 +25,6 @@ class ExcelAdvancedProcess_Node(Node):
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build(node_config)
 
-        self.config = {
-            "user_prompt": "please write a detailed report on the below material",
-            "system_prompt": "You are a security risk professional",
-            "output":"",
-            "additional_input":"",
-            "max_tokens": 1024,
-            "id": "",
-            "object": "",
-            "temperature": ""
-        }
 
         # Create a single instance of the ExtendedConfigDialog
         
@@ -50,7 +40,7 @@ class ExcelAdvancedProcess_Node(Node):
                 "additional_input":"",
                 "max_tokens": 1024,
                 "id": "",
-                "object": "",
+                "properties": "",
                 "temperature": ""
             }  
         else: 

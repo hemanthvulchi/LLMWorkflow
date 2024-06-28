@@ -26,7 +26,7 @@ class OutputViewer_Node(Node):
                 "output":"",
                 "max_tokens": 1024,
                 "id": "",
-                "object": "",
+                "properties": "",
                 "temperature": ""
             }    
         else: 

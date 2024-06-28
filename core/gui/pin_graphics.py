@@ -51,7 +51,7 @@ class Pin_Graphics(QtWidgets.QGraphicsPathItem):
             x = self.radius_ + self.margin
 
         y = self.pin_text_height / 4
-
+        print("Build - pin graphics",nice_name)
         self.text_path.addText(x, y, self.font, nice_name)
 
     def paint(self, painter, option=None, widget=None):

@@ -50,7 +50,7 @@ class Combine_Node(Node):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.input1text = QTextEdit(self.config["input1"])
-        self.input1text.setFixedHeight(50)
+        self.input1text.setFixedHeight(20)
         self.input1text.setStyleSheet("""
         QTextEdit{
         background: rgb(50, 50, 50); /*background color */
@@ -59,7 +59,7 @@ class Combine_Node(Node):
         self.input1text.setReadOnly(True)
 
         self.input2text = QTextEdit(self.config["input2"])
-        self.input2text.setFixedHeight(50)
+        self.input2text.setFixedHeight(20)
         self.input2text.setStyleSheet("""
         QTextEdit{
         background: rgb(50, 50, 50); /*background color */
@@ -68,7 +68,7 @@ class Combine_Node(Node):
         self.input2text.setReadOnly(True)
 
         self.input3text = QTextEdit(self.config["input3"])
-        self.input3text.setFixedHeight(50)
+        self.input3text.setFixedHeight(20)
         self.input3text.setStyleSheet("""
         QTextEdit{
         background: rgb(50, 50, 50); /*background color */
@@ -77,7 +77,7 @@ class Combine_Node(Node):
         self.input3text.setReadOnly(True)
 
         self.input4text = QTextEdit(self.config["input4"])
-        self.input4text.setFixedHeight(50)
+        self.input4text.setFixedHeight(20)
         self.input4text.setStyleSheet("""
         QTextEdit{
         background: rgb(50, 50, 50); /*background color */
@@ -86,7 +86,7 @@ class Combine_Node(Node):
         self.input4text.setReadOnly(True)
 
         self.input5text = QTextEdit(self.config["input5"])
-        self.input5text.setFixedHeight(50)
+        self.input5text.setFixedHeight(20)
         self.input5text.setStyleSheet("""
         QTextEdit{
         background: rgb(50, 50, 50); /*background color */
@@ -95,7 +95,7 @@ class Combine_Node(Node):
         self.input5text.setReadOnly(True)
 
         self.textbox = QTextEdit()
-        self.textbox.setFixedHeight(50)
+        self.textbox.setFixedHeight(20)
         self.responsetext = QTextEdit(self.config["output"])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""

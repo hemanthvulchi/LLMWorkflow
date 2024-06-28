@@ -4,7 +4,7 @@ import traceback
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from core.node import Node
-from core.configdialog import ConfigDialog
+from customnodes.common_widgets.configdialog import ConfigDialog
 from core.common import Node_Status
 from utils.display import Display
 from utils.llmconnection import LLMConnection
@@ -33,7 +33,7 @@ class PowerPointAdvanced_Node(Node):
             "additional_input":"",
             "max_tokens": 1024,
             "id": "",
-            "object": "",
+            "properties": "",
             "temperature": ""
         }
 
@@ -52,7 +52,7 @@ class PowerPointAdvanced_Node(Node):
                 "additional_input":"",
                 "max_tokens": 1024,
                 "id": "",
-                "object": "",
+                "properties": "",
                 "temperature": ""
             }  
         else: 

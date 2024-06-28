@@ -3,7 +3,6 @@ from PySide6.QtWidgets import QLabel
 from core.common import Node_Status
 from core.node import Node
 import utils.themecolors as colors
-from customnodes.common_widgets import FloatLineEdit
 
 
 class SimpleInput_Node(Node):
@@ -30,8 +29,8 @@ class SimpleInput_Node(Node):
         layout.setContentsMargins(0, 0, 0, 0)
         self.textbox = QtWidgets.QTextEdit()
         self.textbox.setPlainText(self.config["input_prompt"])
-        self.textbox.setMinimumWidth(50)
-        self.textbox.setFixedHeight(50)
+        #self.textbox.setMinimumWidth(50)
+        #self.textbox.setFixedHeight(50)
         self.textbox.textChanged.connect(self.inputupdated)
         self.btn = QtWidgets.QPushButton("Save")
         self.btn.clicked.connect(self.btn_cmd)

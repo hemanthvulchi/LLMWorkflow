@@ -13,7 +13,7 @@ import traceback
 class ConfigDialog(QDialog):
     def __init__(self, config_json, parent=None):
         super(ConfigDialog, self).__init__(parent)
-        self.setWindowTitle("OpenAI Configuration")
+        self.setWindowTitle("Prompt Configuration")
         config = json.loads(config_json)
         self.additional_input = config.get("additional_input","")
         self.system_prompt = QTextEdit(config.get("system_prompt", ""))
