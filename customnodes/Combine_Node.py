@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from core.node import Node
 from core.common import Node_Status
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 import openai
 import json
@@ -16,7 +17,8 @@ class Combine_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
         self.title_text = "Combine Data"
-        self.type_text = "Data would be combined"
+        self.type_text = "Combine Data"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
@@ -32,19 +34,7 @@ class Combine_Node(Node):
         self.build(node_config)
 
     def init_widget(self, node_config):
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "input1":"",
-                "input2":"",
-                "input3":"",
-                "input4":"",    
-                "input5":"",
-                "output":""
-            }
-        else: 
-            self.config = node_config  
+        super().init_widget(node_config)        
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -125,6 +115,14 @@ class Combine_Node(Node):
     def setOuput(self):
         self.outpin.set_data(self.config["output"])
         self.outpin2.set_data(self.config["output"])
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
     def btn_refresh(self):
         print("Refreshing data")

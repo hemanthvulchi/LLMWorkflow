@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QTextEdit
 from core.common import Node_Status
 from core.node import Node
 import utils.documents.fileextract as fex
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 import os
 
@@ -11,20 +12,16 @@ class FileExtract_Node(Node):
         super().__init__()
 
         self.title_text = "FileExtract"
-        self.type_text = "ExtractFile"
+        self.type_text = "FileExtract"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 
     def init_widget(self, node_config):  
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "output": "File extract is stored here",
-                }    
-        else: 
-            self.config = node_config              
+        super().init_widget(node_config)        
+
+                    
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -57,6 +54,13 @@ class FileExtract_Node(Node):
     def setOutput(self):
         self.pin_output.set_data(self.config["output"])
 
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
     
     def btn_extract(self):
         print("btn command:")

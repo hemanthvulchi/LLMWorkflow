@@ -23,16 +23,14 @@ from core.gui.node_list import NodeList
 from core.gui.node_widget import NodeWidget
 from utils.display import Display
 from utils.datamodels import ModelSelection, SelectedLLM
-from customnodes.common_widgets.configdialog import ConfigDialog
+from customnodes.common_widgets.ConfigDialog import ConfigDialog
 from utils.llmconnection import LLMConnection
 from utils.vectordb import VectorDB
 from customnodes.Aggregate_Node import Aggregate_Node
 from customnodes.Combine_Node import Combine_Node
 from customnodes.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
-from customnodes.ExcelBasicProcess_Node import ExcelBasicProcess_Node
 from customnodes.Input_Node import Input_Node
 from customnodes.Chat_Node import Chat_Node
-from customnodes.PowerPoint_Node import PowerPoint_Node
 from customnodes.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from customnodes.OutputViewer_Node import OutputViewer_Node
 from customnodes.SimpleInput_Node import SimpleInput_Node
@@ -45,7 +43,7 @@ import utils.themecolors as colors
 #logging.basicConfig(level=logging.DEBUG)
 
 
-class NodeEditor(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     OnProjectPathUpdate = QtCore.Signal(Path)
 
     def __init__(self, parent=None):
@@ -350,7 +348,7 @@ if __name__ == "__main__":
         print("Set ChromaDB client")
         vDB = VectorDB()
         print("Initialized ChromaDB")
-        launcher = NodeEditor()
+        launcher = MainWindow()
         sLLM = SelectedLLM()
         print("Initiated NodeEditor")
         launcher.setLLM(sLLM.selected_company)

@@ -2,6 +2,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
 from core.common import Node_Status
 from core.node import Node
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 
 
@@ -10,21 +11,16 @@ class SimpleTransform_Node(Node):
         super().__init__()
 
         self.title_text = "Simple Transform"
-        self.type_text = "Transform Data"
+        self.type_text = "Simple Transform"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         self.pin_A = self.add_pin(name="input", is_output=False)
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 
     def init_widget(self, node_config):  
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "input_prompt": "enter your input here",
-                }    
-        else: 
-            self.config = node_config              
+        super().init_widget(node_config)        
+                         
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -103,6 +99,14 @@ class SimpleTransform_Node(Node):
 
         # Show the dialog and bring it to the front
         dialog.exec()
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
     def save_data(self, dialog, text_area):
         self.textbox.setText(text_area.toPlainText())

@@ -2,6 +2,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel
 from core.common import Node_Status
 from core.node import Node
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 
 
@@ -10,20 +11,16 @@ class SimpleInput_Node(Node):
         super().__init__()
 
         self.title_text = "Simple Input"
-        self.type_text = "Just Add Simple Input"
+        self.type_text = "Simple Input"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)
 
     def init_widget(self, node_config):  
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "input_prompt": "enter your input here",
-                }    
-        else: 
-            self.config = node_config              
+        super().init_widget(node_config)        
+
+                   
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -34,7 +31,6 @@ class SimpleInput_Node(Node):
         self.textbox.textChanged.connect(self.inputupdated)
         self.btn = QtWidgets.QPushButton("Save")
         self.btn.clicked.connect(self.btn_cmd)
-
 
         layout.addWidget(self.textbox)
         layout.addWidget(self.btn)
@@ -48,7 +44,14 @@ class SimpleInput_Node(Node):
     def setOuput(self):
         self.pin_output.set_data(self.config["input_prompt"])
 
-    
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)    
+
     def btn_cmd(self):
         print("btn command:")
         self.pin_output.set_data(self.textbox.toPlainText())

@@ -30,8 +30,6 @@ class NodeList(QtWidgets.QListWidget):
 
     def mousePressEvent(self, event):
         item = self.itemAt(event.pos())
-        print(item)
-        print(item.text())
         if item and item.text():
             name = item.text()
             #name = self.itemWidget(item).text()

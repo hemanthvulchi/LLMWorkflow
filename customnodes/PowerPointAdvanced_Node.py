@@ -4,11 +4,12 @@ import traceback
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QLineEdit, QPushButton, QComboBox, QFileDialog, QMessageBox, QVBoxLayout, QFormLayout
 from core.node import Node
-from customnodes.common_widgets.configdialog import ConfigDialog
+from customnodes.common_widgets.ConfigDialog import ConfigDialog
 from core.common import Node_Status
 from utils.display import Display
 from utils.llmconnection import LLMConnection
 from pptx.util import Inches
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 import win32com.client
 import pandas as pd
@@ -19,44 +20,20 @@ class PowerPointAdvanced_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
         self.title_text = "PowerPoint Interface"
-        self.type_text = "Work with PowerPoint"
+        self.type_text = "PowerPoint Interface"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("output"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.build(node_config)
 
-        self.config = {
-            "user_prompt": "content from slide:",
-            "system_prompt": "You are a security risk professional. You will be presented with slide data" 
-                             " and then reference information,with which you will have to reivew the slide content",
-            "output":"",
-            "additional_input":"",
-            "max_tokens": 1024,
-            "id": "",
-            "properties": "",
-            "temperature": ""
-        }
-
         # Create a single instance of the ExtendedConfigDialog
         
         
     def init_widget(self,node_config):
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "user_prompt": "content from slide:",
-                "system_prompt": "You are a security risk professional. You will be presented with slide data" 
-                                " and then reference information,with which you will have to reivew the slide content",
-                "output":"",
-                "additional_input":"",
-                "max_tokens": 1024,
-                "id": "",
-                "properties": "",
-                "temperature": ""
-            }  
-        else: 
-            self.config = node_config        
+        super().init_widget(node_config)        
+
+
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -87,6 +64,14 @@ class PowerPointAdvanced_Node(Node):
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
     def show_configuration(self):
         self.btn_refresh()

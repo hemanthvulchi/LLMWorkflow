@@ -2,7 +2,8 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QLabel, QTextEdit, QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QCheckBox, QSlider, QPushButton
 from PySide6.QtCore import Qt
 from core.node import Node
-from customnodes.common_widgets.configdialog import ConfigDialog
+from customnodes.common_widgets.ConfigDialog import ConfigDialog
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import utils.themecolors as colors
@@ -14,7 +15,8 @@ class Aggregate_Node(Node):
         super().__init__()
 
         self.title_text = "GenAI Aggregate"
-        self.type_text = "Data to be entered"
+        self.type_text = "GenAI Aggregate"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)
         #self.pin_output = self.add_pin(name="Ex Out", is_output=True, execution=True)
@@ -28,21 +30,7 @@ class Aggregate_Node(Node):
 
 
     def init_widget(self, node_config):
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "user_prompt": "please write a detailed report on the below material",
-                "system_prompt": "You are a security risk professional",
-                "output":"",
-                "max_tokens": 1024,
-                "id": "",
-                "properties": "",
-                "temperature": "",
-                "input1":"",
-                "input2":""
-                }    
-        else: 
-            self.config = node_config        
+        super().init_widget(node_config)
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -147,6 +135,14 @@ class Aggregate_Node(Node):
         response = connection.call_prompt(joined_text,self.config["system_prompt"])
         self.responsetext.setText(str(response))
         self.pin_output.set_data(str(response))
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
 class ExtendedConfigDialog(ConfigDialog):
     def __init__(self, config_json, openAIclient, parent=None):

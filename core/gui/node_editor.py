@@ -73,6 +73,7 @@ class NodeEditor(QtCore.QObject):
             return False
 
         if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
+            print("GraphicsSceneMousePress at pos:",event.scenePos())
             if event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
 
@@ -106,8 +107,14 @@ class NodeEditor(QtCore.QObject):
                     self._last_selected = None
 
             elif event.button() == QtCore.Qt.RightButton:
-                # context menu
-                pass
+                item = self.item_at(event.scenePos())
+                print("QtCore.Qt.RightButton")
+                print("item:",item)
+                print("event pos:",event.scenePos())                
+                if isinstance(item, Node):
+                    item.on_right_click(event.scenePos())
+                    return True
+
 
         elif event.type() == QtCore.QEvent.KeyPress:
             if event.key() == QtCore.Qt.Key_Delete:
@@ -153,6 +160,18 @@ class NodeEditor(QtCore.QObject):
                     self.connection.delete()
                 self.connection = None
                 self.port = None
+                return True
+
+        elif event.type() == QtCore.QEvent.GraphicsSceneMouseDoubleClick:
+            item = self.item_at(event.scenePos())
+            if isinstance(item, Node):
+                click_relative_position = item.mapFromScene(event.scenePos())
+                click_relative_height = click_relative_position.y()
+                node_title_pos = -((item._height/2) - item._titleheight)
+                if node_title_pos > click_relative_height:
+                    item.topbar_doubleclick()
+                else:
+                    print("Clicked on bottom")
                 return True
 
         return super().eventFilter(watched, event)

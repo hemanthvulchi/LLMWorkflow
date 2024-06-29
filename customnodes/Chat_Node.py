@@ -3,7 +3,8 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtCore import Qt
 from core.node import Node
-from customnodes.common_widgets.configdialog import ConfigDialog
+from customnodes.common_widgets.ConfigDialog import ConfigDialog
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import json
@@ -15,7 +16,7 @@ class Chat_Node(Node):
         super().__init__()
 
         self.title_text = "WIP: GenAI Chat"
-        self.type_text = "WORK IN PROGRESS: Chat with AI"
+        self.type_text = "WIP: GenAI Chat"
         self.set_color(colors.get_color_rgb("transform"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build()
@@ -30,7 +31,8 @@ class Chat_Node(Node):
             "temperature": ""
         }
 
-    def init_widget(self):
+    def init_widget(self,node_config):
+        super().init_widget(node_config)
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -62,7 +64,7 @@ class Chat_Node(Node):
         proxy.setWidget(self.widget)
         proxy.setParentItem(self)
 
-        super().init_widget()
+        super().init_widget(node_config)
 
     def show_configuration(self):
         self.config["user_prompt"] = self.textbox.toPlainText()
@@ -86,6 +88,15 @@ class Chat_Node(Node):
         self.status = Node_Status.CLEAN  
         self.responsetext.setText(str(response))
         self.pin_output.set_data(self.responsetext.toPlainText())
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
+
 
 class ExtendedConfigDialog(ConfigDialog):
     def __init__(self, config_json, parent=None):

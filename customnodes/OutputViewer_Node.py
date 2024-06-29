@@ -1,14 +1,16 @@
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from core.node import Node
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 
 class OutputViewer_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "Output Viewere"
-        self.type_text = "View ouput"
+        self.title_text = "Output Viewer"
+        self.type_text = "Output Viewer"
+        self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("output"))
 
         #self.add_pin(name="Ex In", is_output=False, execution=True)
@@ -17,20 +19,8 @@ class OutputViewer_Node(Node):
         self.build(node_config)
 
     def init_widget(self, node_config):
-        super().init_widget()        
+        super().init_widget(node_config)        
         self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "user_prompt": "write your prompt here",
-                "system_prompt": "You are a security risk professional",
-                "output":"",
-                "max_tokens": 1024,
-                "id": "",
-                "properties": "",
-                "temperature": ""
-            }    
-        else: 
-            self.config = node_config
 
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
@@ -89,6 +79,14 @@ class OutputViewer_Node(Node):
         dialog.show()
         dialog.activateWindow()
         dialog.raise_()
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
     def _copy_to_clipboard(self, text):
         clipboard = QtWidgets.QApplication.clipboard()

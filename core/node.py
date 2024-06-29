@@ -1,17 +1,60 @@
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
-
+from PySide6 import QtWidgets, QtCore
 from core.pin import Pin
 from core.gui.node_graphics import Node_Graphics
+from PySide6.QtGui import QCursor
 from core.common import Node_Status
+from abc import ABC, abstractmethod
 
 
 class Node(Node_Graphics):
     def __init__(self):
         super().__init__()
+        self.title_text = "Node Name"
+        self.type_text = "Node Name"
+        self.description = "Enter Description"        
 
     # Override me
-    def init_widget(self):
+
+    def init_widget(self,node_config):
+        self.config = node_config        
+        if node_config == {}:
+            self.config = {
+                "user_prompt": "write your prompt here",
+                "input_prompt": "write your prompt here",
+                "title_text": "GenAI Input",
+                "description": "enter description for node",
+                "system_prompt": "You are a security risk professional",
+                "output":"",
+                "max_tokens": 1024,
+                "id": "",
+                "properties": "",
+                "temperature": "",
+                "input1":"",
+                "input2":"",
+                "input3":"",
+                "input4":"",
+                "input5":""
+                }    
+        else: 
+            self.config = node_config
+            self.title_text = node_config['title_text']
+            self.description = node_config['description']
+
+    def on_right_click(self,position):
+        print("In Right Click")
+        print("Action")
+        menu = QtWidgets.QMenu()
+        delete_action = menu.addAction("Delete Node")
+        properties_action = menu.addAction("Properties")
+        action = menu.exec_(QCursor.pos())
+        if action == delete_action:
+            self.delete()
+        elif action == properties_action:
+            self.topbar_doubleclick()
+
+    # Method to display the node's properties
+    @abstractmethod
+    def topbar_doubleclick(self):
         pass
 
     def compute(self):

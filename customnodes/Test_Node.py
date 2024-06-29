@@ -3,9 +3,10 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtCore import Qt
 from core.node import Node
-from customnodes.common_widgets.configdialog import ConfigDialog
+from customnodes.common_widgets.ConfigDialog import ConfigDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
 import json
 
@@ -22,20 +23,8 @@ class Test_Node(Node):
 
 
     def init_widget(self, node_config):
-        super().init_widget()        
-        self.config = node_config        
-        if node_config == {}:
-            self.config = {
-                "user_prompt": "write your prompt here",
-                "system_prompt": "You are a security risk professional",
-                "output":"",
-                "max_tokens": 1024,
-                "id": "",
-                "properties": "",
-                "temperature": ""
-            }    
-        else: 
-            self.config = node_config
+        super().init_widget(node_config)        
+            
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
@@ -72,6 +61,14 @@ class Test_Node(Node):
 
     def setOuput(self):
         self.pin_output.set_data(self.config["output"])
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
 
     def show_configuration(self):
         self.config["user_prompt"] = self.textbox.toPlainText()
