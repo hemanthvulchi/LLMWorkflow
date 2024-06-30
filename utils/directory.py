@@ -6,6 +6,12 @@ def get_current_directory():
 def get_db_filepath(persist_directory):
     return os.path.join(persist_directory, "chroma.sqlite3") 
 
+def get_icon_path(file_name):
+    complete_file_name = file_name + ".svg"
+    current_directory = os.path.join(get_current_directory(), "resources\\node_icons")
+    file_path = os.path.join(current_directory, complete_file_name)
+    return file_path
+
 def check_directory(directory_name):
     directory_path = os.path.join(get_current_directory(), directory_name)
     if not os.path.exists(directory_path):
@@ -14,3 +20,9 @@ def check_directory(directory_name):
     else:
         print(f"Directory '{directory_path}' exists")
     return directory_path
+
+
+
+if __name__ == "__main__":
+    path = get_icon_path('powerpoint')
+    print(path)

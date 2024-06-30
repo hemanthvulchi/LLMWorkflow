@@ -7,7 +7,6 @@ from utils import directory
 class Node_Graphics(QtWidgets.QGraphicsItem):
     def __init__(self):
         super().__init__()
-
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
 

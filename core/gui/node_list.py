@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtGui, QtWidgets
-import utils.themecolors as colors
+import utils.directory as directory
 
 class ListWidgetButton(QtWidgets.QPushButton):
     def __init__(self, text):
@@ -21,6 +21,9 @@ class NodeList(QtWidgets.QListWidget):
             item = QtWidgets.QListWidgetItem(name)
             item.module = data["module"]
             item.class_name = data["class"]
+            icon_path = directory.get_icon_path(data["image"])
+            icon = QtGui.QIcon(icon_path)
+            item.setIcon(icon)            
             item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             bfont = QtGui.QFont()
             bfont.setBold(True)

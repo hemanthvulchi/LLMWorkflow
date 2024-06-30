@@ -222,7 +222,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     background: {color};
                     margin: 2px;
                     padding: 2px;
-                    border-radius: 5px;            
+                    border-radius: 5px;   
+                    height: 20px;         
                 }}
                 """
     def create_external_group_box(self, title, color):
@@ -303,19 +304,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_imports = {}
         self.transform_imports = {}
         self.output_imports = {}
-        self.input_imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__}
-        self.input_imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__}
-        self.input_imports['FileExtract_Node'] = {"class": FileExtract_Node, "module": FileExtract_Node.__module__}
-        self.transform_imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__}        
-        self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__}
-        self.transform_imports['TransformLLM_Node'] = {"class": TransformLLM_Node, "module": TransformLLM_Node.__module__}
-        self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__}
-        self.transform_imports['Test_Node'] = {"class": Test_Node, "module": Test_Node.__module__}
-        self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__}
-        #self.output_imports['ExcelBasicProcess_Node'] = {"class": ExcelBasicProcess_Node, "module": ExcelBasicProcess_Node.__module__}
-        #self.output_imports['PowerPoint_Node'] = {"class": PowerPoint_Node, "module": PowerPoint_Node.__module__}
-        self.output_imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__}
-        self.output_imports['OutputViewer_Node'] = {"class": OutputViewer_Node, "module": OutputViewer_Node.__module__}
+        self.input_imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__,"image":'textinput'}
+        self.input_imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__,"image":'assistant'}
+        self.input_imports['FileExtract_Node'] = {"class": FileExtract_Node, "module": FileExtract_Node.__module__,"image":'fileextract'}
+        self.transform_imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__,"image":'simpletransform'}        
+        self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__,"image":'combine'}
+        self.transform_imports['TransformLLM_Node'] = {"class": TransformLLM_Node, "module": TransformLLM_Node.__module__,"image":'assistant'}
+        self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__,"image":'aggregate'}
+        self.transform_imports['Test_Node'] = {"class": Test_Node, "module": Test_Node.__module__,"image":'assistant'}
+        self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__,"image":'excel'}
+        self.output_imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__,"image":'powerpoint'}
+        self.output_imports['OutputViewer_Node'] = {"class": OutputViewer_Node, "module": OutputViewer_Node.__module__,"image":'outputviewer'}
 
         # Update project with the preloaded classes
         self.input_node_list.update_project(self.input_imports)
@@ -409,7 +408,7 @@ if __name__ == "__main__":
         launcher = MainWindow()
         sLLM = SelectedLLM()
         launcher.set_rag_no_files_lineedit(noOfFiles)
-        print("Initiated NodeEditor")
+        print("Initiated Main Window")
         launcher.setLLM(sLLM.selected_company)
         launcher.setModel(sLLM.selected_model)
         launcher.show()

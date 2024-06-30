@@ -115,6 +115,7 @@ class ModelSelection:
 if __name__ == "__main__":
     import qdarktheme    
     app = QApplication(sys.argv)
+    qdarktheme.setup_theme()
     model_selection = ModelSelection()
     model_selection.select_models()
     sLLM = SelectedLLM()
