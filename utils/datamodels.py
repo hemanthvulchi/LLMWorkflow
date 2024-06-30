@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QComboBox, QMessageBox, QApplication, QPushButton, QLabel, QGridLayout
-from PySide6 import QtGui
+from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 
 LLM_MODELS = []
@@ -33,12 +33,16 @@ class ModelSelection:
                 ("Gemini 1.0 Pro(32K): $0.50 & $1.50", "gemini-1.0-pro", "32000")
             ]
         }
+        self.settings = ""
+        self.settings = QtCore.QSettings("node-editorDisplay", "NodeEditorDisplay")
+        self.restore_last_state()
 
     def select_models(self):
         selLLM = SelectedLLM()
         dialog = QDialog()
         dialog.setWindowTitle("Select Model")
         dialog.setWindowIcon(QtGui.QIcon("resources\\ai.jpg"))
+        
         layout = QGridLayout()
         company_label = QLabel("LLM Family")
         model_label = QLabel("LLM Model")
@@ -46,7 +50,7 @@ class ModelSelection:
         company_combo = QComboBox()
         company_combo.addItems(self.llm_companies)
         model_combo = QComboBox()
-        label_disclaimer = QLabel("Connection to OpenAI and Google Gemini are done with my personal API keys (my own cost). Have mercy :)")
+        label_disclaimer = QLabel("CONCEPTUAL PROOF OF CONCEPT")
         label_warning = QLabel("This is a proof of concept and has not been approved for official use")
 
         layout.addWidget(company_label, 0, 0)
@@ -78,6 +82,7 @@ class ModelSelection:
             dialog.accept()
 
         select_button = QPushButton("Select")
+        select_button.setStyleSheet("background-color: green; color: white;")
         select_button.clicked.connect(on_select)
         layout.addWidget(select_button, 3, 1)  # Span across 2 columns
         dialog.setLayout(layout)
@@ -85,6 +90,26 @@ class ModelSelection:
             print("No model selected, exiting.")
             QMessageBox()            
             sys.exit()
+
+    def restore_last_state(self):
+        if self.settings.contains("geometry"):
+            self.restoreGeometry(self.settings.value("geometry"))
+            s = self.settings.value("splitterSize")
+            self.splitter.restoreState(s)
+
+    def closeEvent(self, event):
+        """
+        Handles the close event by saving the GUI state and closing the application.
+        Args:
+            event: Close event.
+        Returns:
+            None.
+        """
+        # debugging lets save the scene:
+        # self.node_widget.save_project("C:/Users/Howard/simple-node-editor/Example_Project/test.json")        self.settings = QtCore.QSettings("node-editor", "NodeEditor")
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("splitterSize", self.splitter.saveState())
+        QtWidgets.QWidget.closeEvent(self, event)
 
 # Example usage
 if __name__ == "__main__":

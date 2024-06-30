@@ -7,7 +7,7 @@ class PropertiesDialog(QtWidgets.QDialog):
         self.setWindowTitle("Edit Node Properties")
         self.move(QCursor.pos())        
         self.title_input = QtWidgets.QLineEdit(title)
-        self.title_input.setMaxLength(20)
+        self.title_input.setMaxLength(30)
         self.description = QtWidgets.QTextEdit(type)
     
         layout = QtWidgets.QFormLayout(self)

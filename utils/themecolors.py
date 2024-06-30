@@ -1,14 +1,43 @@
-#store theme colors
+# #store theme colors
+# colors = {
+#     'output': '#016FB9',
+#     'transform': '#CB7301',    
+#     'input': '#037c6e',
+#     'danger': '#C1292E',
+#     'maize': '#F7EF81',
+#     'info': '#17a2b8',
+#     'light': '#f8f9fa',
+#     'dark': '#343a40',
+#     'border': '#646464',  # Border color (11, 53, 181)
+# }
+
+# colors = {
+#     'output': '#058b49,
+#     'transform': '#13a8e4',    
+#     'input': '#fca70f',
+#     'primary':'#2683C6',
+#     'danger': '#C1292E',
+#     'maize': '#F7EF81',
+#     'info': '#17a2b8',
+#     'light': '#f8f9fa',
+#     'dark': '#343a40',
+#     'border': '#646464',  # Border color (11, 53, 181)
+#     'connection': '#ff8b00'
+# }
+
 colors = {
-    'output': '#016FB9',
-    'transform': '#CB7301',    
-    'input': '#037c6e',
+    'output': '#33954F',
+    'transform': '#c04000',  
+    'transform2': '#A76FFF',  
+    'input': '#0184D5',
+    'primary':'#2683C6',
     'danger': '#C1292E',
     'maize': '#F7EF81',
     'info': '#17a2b8',
     'light': '#f8f9fa',
     'dark': '#343a40',
-    'border': '#646464',  # Border color (11, 53, 181)
+    'border': '#646464',  
+    'brightborder': '#dedede'
 }
 
 def get_color_hex(color_name):

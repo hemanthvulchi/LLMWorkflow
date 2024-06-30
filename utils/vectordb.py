@@ -28,6 +28,17 @@ class VectorDB:
         # Query the database using the provided arguments
         return self.connection.reload_chromaDB(*args, **kwargs)    
 
+    def get_filelist_db(self, *args, **kwargs):
+        # Query the database using the provided arguments
+        return self.connection.get_filelist_db(*args, **kwargs)    
+    
+    def get_count_files_in_list_db(self, *args, **kwargs):
+        # Query the database using the provided arguments
+        return self.connection.get_count_files_in_list_db(*args, **kwargs)    
+
+
+
+
 #ChromaDB vector database
 class ChromaVectorDB:
     _instance = None
@@ -164,6 +175,19 @@ class ChromaVectorDB:
             file_list_string =  file_list_string  + '\n' + file_path
         
         return file_list_string
+
+    def get_filelist_db(self):
+        print("Getting filelist")
+        file_list = self.load_file_list(self.settings_folder)
+        file_list_string =""
+        for file_path in file_list:
+            file_list_string = file_list_string  + '\n' + file_path
+        return file_list_string
+
+    def get_count_files_in_list_db(self):
+        file_list = self.load_file_list(self.settings_folder)
+        num_files = len(file_list)
+        return num_files
 
     #need to check if the collection should be recreated
     def reload_chromaDB(self):

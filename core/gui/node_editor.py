@@ -73,7 +73,6 @@ class NodeEditor(QtCore.QObject):
             return False
 
         if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
-            print("GraphicsSceneMousePress at pos:",event.scenePos())
             if event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
 

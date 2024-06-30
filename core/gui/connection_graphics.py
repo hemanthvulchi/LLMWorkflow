@@ -1,6 +1,5 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
-
 class Connection_Graphics(QtWidgets.QGraphicsPathItem):
     """
     A Connection represents a graphical connection between two NodePorts in a PySide6 application.
@@ -69,7 +68,7 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):
         """
 
         thickness = 0
-        color = QtGui.QColor(0, 128, 255)
+        color = QtGui.QColor(200,200,200)
         if self.start_pin:
             if self.start_pin.execution:
                 thickness = 3

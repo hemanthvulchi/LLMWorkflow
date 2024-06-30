@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_connection_widgets()
         self.init_labels()
         self.init_node_lists()
-
+        
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
         self.node_widget = NodeWidget(self)
@@ -103,27 +103,50 @@ class MainWindow(QtWidgets.QMainWindow):
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
-        
-        connection_layout = QtWidgets.QHBoxLayout()
-        connection_layout.addWidget(self.connection_label)
-        connection_layout.addWidget(self.connectionText)
-        left_layout.addLayout(connection_layout)
-        
-        model_layout = QtWidgets.QHBoxLayout()
-        model_layout.addWidget(self.model_label)
-        model_layout.addWidget(self.modelText)
-        left_layout.addLayout(model_layout)
 
-        left_layout.addWidget(self.connection_label)
-        left_layout.addWidget(self.connectionText)        
-        left_layout.addWidget(self.model_label)
-        left_layout.addWidget(self.modelText)  
-        left_layout.addWidget(self.nodes_label)         
-        left_layout.addWidget(self.input_nodes_group)
-        left_layout.addWidget(self.transform_nodes_group)
-        left_layout.addWidget(self.output_nodes_group)   
-              
+        self.init_ui_nodeGroupBox()
+        self.init_ui_modelGroupBox()
+        self.init_ui_ragGroupBox()
+
+        left_layout.addWidget(self.nodeGroupBox)
+        left_layout.addWidget(self.modelGroupBox)
+        left_layout.addWidget(self.ragGroupBox)
+        #left_layout.addItem(self.bottom_spacer)  
+        #               
         main_layout.addWidget(self.splitter)
+
+    def init_ui_nodeGroupBox(self):
+        self.nodeGroupBox = self.create_external_group_box("Nodes",colors.get_color_hex("brightborder"))
+        left_node_layout = QtWidgets.QVBoxLayout()
+        left_node_layout.addWidget(self.nodes_label)
+        left_node_layout.addWidget(self.input_nodes_group)
+        left_node_layout.addWidget(self.transform_nodes_group)
+        left_node_layout.addWidget(self.output_nodes_group)
+        self.nodeGroupBox.setLayout(left_node_layout)
+
+    def init_ui_modelGroupBox(self):
+        self.modelGroupBox = self.create_external_group_box("Selected Model",colors.get_color_hex("brightborder"))
+        left_model_layout = QtWidgets.QVBoxLayout()        
+        left_model_layout.addWidget(self.connectionText)
+        left_model_layout.addWidget(self.modelText)
+        self.modelGroupBox.setLayout(left_model_layout)
+        self.modelGroupBox.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+    def init_ui_ragGroupBox(self):
+        self.ragGroupBox = self.create_external_group_box("RAG (Document Database)",colors.get_color_hex("brightborder"))
+        rag_layout = QtWidgets.QVBoxLayout()
+        rag_line_layout = QtWidgets.QHBoxLayout()
+        no_of_files_label = QtWidgets.QLabel("No of files indexed in RAG:")
+        rag_line_layout.addWidget(no_of_files_label)
+        self.rag_no_files_lineedit = QtWidgets.QLineEdit()
+        self.rag_no_files_lineedit.setReadOnly(True)
+        rag_line_layout.addWidget(self.rag_no_files_lineedit)
+        rag_layout.addLayout(rag_line_layout)        
+        rag_button = QtWidgets.QPushButton("Show Files List")
+        rag_button.setStyleSheet("QPushButton { font-weight: bold; }")
+        rag_button.clicked.connect(self.get_filelist_vectorDB)
+        rag_layout.addWidget(rag_button)
+        self.ragGroupBox.setLayout(rag_layout)        
 
     def init_connection_widgets(self):
         # Initialize connection text widgets with styles
@@ -137,9 +160,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.connection_label = self.create_label("Selected LLM", custom_font)
         self.model_label = self.create_label("Selected Model", custom_font)
         custom_font = QtGui.QFont()
-        custom_font.setBold(True)
-        custom_font.setUnderline(True)
-        self.nodes_label = self.create_label("Nodes (Drag and Drop)", custom_font)
+        custom_font.setBold(False)
+        custom_font.setItalic(True)
+        self.nodes_label = self.create_label("Drag and drop below nodes", custom_font)
+        self.bottom_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+
 
     def init_node_lists(self):
         # Initialize node lists with styles
@@ -186,42 +211,60 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_node_list_style(self, color):
         return f"""
                 QListWidget {{
-                    background: rgb(50, 50, 50);
+                    background: rgb(25, 25, 25);
                     color: white;               
-                    border: 1px solid {colors.get_color_hex('border')};         
+                    border: 2px solid color;         
                     padding: 10px;             
                 }}
 
                 QListWidget::item {{
-                    border: 1px solid {color};
-                    background: rgb(75, 75, 75);
+                    border: 1px solid {colors.get_color_hex('dark')};
+                    background: {color};
                     margin: 2px;
-                    padding: 1px;
-                    border-radius: 10px;            
+                    padding: 2px;
+                    border-radius: 5px;            
                 }}
                 """
-
-    def create_group_box(self, title, widget, color):
+    def create_external_group_box(self, title, color):
         group_box = QtWidgets.QGroupBox(title)
-        # font = group_box.font()
-        # font.setPointSize(10)  # Set font size
-        # group_box.setFont(font)        
         group_box.setStyleSheet(f"""
             QGroupBox {{
-                border: 2px solid {colors.get_color_hex('border')};
+                border: 2px solid {color};
                 border-radius: 5px;
-                margin-top: 10px;
+                margin-top: 10px; /* Optional spacing adjustment */
             }}
             QGroupBox::title {{
                 color: {color};
                 subcontrol-origin: margin;
                 subcontrol-position: top left; 
                 padding: 0 3px;
-                font-size: 24px;
+                font-size: 30px; /* Adjust as needed */
             }}
         """)
+        return group_box
+
+    def create_group_box(self, title, widget, color):
+        group_box = QtWidgets.QGroupBox(title)
+        group_box.setStyleSheet(f"""
+            QGroupBox {{
+                border: 2px solid {colors.get_color_hex('border')};
+                border-radius: 5px;
+                margin-top: 5px;
+            }}
+            QGroupBox::title {{
+                color: {color};
+                subcontrol-origin: margin;
+                subcontrol-position: top left; 
+                padding: 0 3px;
+                font-size: 16px;
+                font-weight: bold;
+                text-decoration: underline;
+            }}
+        """)
+
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(widget)
+        if widget:
+            layout.addWidget(widget)
         group_box.setLayout(layout)
         return group_box
 
@@ -242,6 +285,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setModel(self,textModel):
         self.modelText.setPlainText(textModel)
+
+    def setRAGNo(self,numberOfFiles):
+        self.rag_no_files_lineedit.text = numberOfFiles
 
     def save_project(self):
         file_dialog = QtWidgets.QFileDialog()
@@ -312,7 +358,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_vectorDB(self):
         vDB = VectorDB()
         response = vDB.update_db()
+        noOfFiles = vDB.get_count_files_in_list_db()
+        self.set_rag_no_files_lineedit(noOfFiles)
         Display.show_message_box( "Success", "Document database refreshed\n " + str(response))
+
+
+    def get_filelist_vectorDB(self):
+        vDB = VectorDB()
+        file_list = vDB.get_filelist_db()
+        Display.show_message_box("Files in RAG","List of files currently indexed and that can be searched:\n " + str(file_list))
+
+    def set_rag_no_files_lineedit(self,noOfFiles):
+        self.rag_no_files_lineedit.setText(str(noOfFiles))
 
     def closeEvent(self, event):
         """
@@ -347,9 +404,11 @@ if __name__ == "__main__":
         print("Setting up environment for database")
         print("Set ChromaDB client")
         vDB = VectorDB()
+        noOfFiles = vDB.get_count_files_in_list_db()
         print("Initialized ChromaDB")
         launcher = MainWindow()
         sLLM = SelectedLLM()
+        launcher.set_rag_no_files_lineedit(noOfFiles)
         print("Initiated NodeEditor")
         launcher.setLLM(sLLM.selected_company)
         launcher.setModel(sLLM.selected_model)
