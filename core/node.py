@@ -41,8 +41,6 @@ class Node(Node_Graphics):
             self.description = node_config['description']
 
     def on_right_click(self,position):
-        print("In Right Click")
-        print("Action")
         menu = QtWidgets.QMenu()
         delete_action = menu.addAction("Delete Node")
         properties_action = menu.addAction("Properties")

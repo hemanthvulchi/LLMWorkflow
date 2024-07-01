@@ -9,6 +9,7 @@ from utils.llmconnection import LLMConnection
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 from utils.datamodels import SelectedLLM
 import utils.themecolors as colors
+import utils.directory as directory
 import openpyxl
 import pandas as pd
 import json
@@ -21,6 +22,7 @@ class ExcelAdvancedProcess_Node(Node):
         super().__init__()
         self.title_text = "Excel Interface"
         self.type_text = "Excel Interface"
+        self.icon_file_path = directory.get_icon_path("excel") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("output"))
         self.pin_output = self.add_pin(name="value", is_output=True)

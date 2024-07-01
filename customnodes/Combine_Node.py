@@ -7,6 +7,7 @@ from core.node import Node
 from core.common import Node_Status
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 import openai
 import json
 
@@ -18,6 +19,7 @@ class Combine_Node(Node):
         super().__init__()
         self.title_text = "Combine Data"
         self.type_text = "Combine Data"
+        self.icon_file_path = directory.get_icon_path("combine") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)

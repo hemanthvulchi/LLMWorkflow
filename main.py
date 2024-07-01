@@ -15,6 +15,8 @@ from pathlib import Path
 import importlib
 import inspect
 import chromadb
+import os
+import shutil
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 from PySide6 import QtCore, QtGui, QtWidgets
 import qdarktheme
@@ -29,16 +31,17 @@ from utils.vectordb import VectorDB
 from customnodes.Aggregate_Node import Aggregate_Node
 from customnodes.Combine_Node import Combine_Node
 from customnodes.ExcelAdvancedProcess_Node import ExcelAdvancedProcess_Node
-from customnodes.Input_Node import Input_Node
+from customnodes.AI_Prompt import AIPrompt_Node
 from customnodes.Chat_Node import Chat_Node
 from customnodes.PowerPointAdvanced_Node import PowerPointAdvanced_Node
 from customnodes.OutputViewer_Node import OutputViewer_Node
-from customnodes.SimpleInput_Node import SimpleInput_Node
-from customnodes.SimpleTransform_Node import SimpleTransform_Node
+from customnodes.TextInput_Node import TextInput_Node
+from customnodes.TextEdit_Node import TextEdit_Node
 from customnodes.FileExtract_Node import FileExtract_Node
-from customnodes.TransformLLM_Node import TransformLLM_Node
+from customnodes.AIPromptInput_Node import AI_Prompt_Input_Node
 from customnodes.Test_Node import Test_Node
 import utils.themecolors as colors
+import utils.directory as directory
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -66,7 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menuBar().addMenu(file_menu)
 
         load_action = QtGui.QAction("Load Project", self)
-        load_action.triggered.connect(self.get_project_path)
+        load_action.triggered.connect(self.load_project)
         file_menu.addAction(load_action)
 
         save_action = QtGui.QAction("Save Project", self)
@@ -82,88 +85,103 @@ class MainWindow(QtWidgets.QMainWindow):
         reference_menu.addAction(updateDB_action)
 
     def init_ui(self):
-        # Layouts
+        # Create main layout
         main_widget = QtWidgets.QWidget()
         self.setCentralWidget(main_widget)
         main_layout = QtWidgets.QHBoxLayout()
         main_widget.setLayout(main_layout)
+
+        #Create left layout
         left_layout = QtWidgets.QVBoxLayout()
         left_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Widgets
-        self.init_connection_widgets()
-        self.init_labels()
-        self.init_node_lists()
-        
         left_widget = QtWidgets.QWidget()
+        left_widget.setLayout(left_layout)
+        
+        # Create splitter 
         self.splitter = QtWidgets.QSplitter()
         self.node_widget = NodeWidget(self)
-
-        # Add Widgets to layouts
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
-        left_widget.setLayout(left_layout)
-
+        
+        #Create parts of left layout
         self.init_ui_nodeGroupBox()
         self.init_ui_modelGroupBox()
         self.init_ui_ragGroupBox()
 
         left_layout.addWidget(self.nodeGroupBox)
-        left_layout.addWidget(self.modelGroupBox)
         left_layout.addWidget(self.ragGroupBox)
+        left_layout.addWidget(self.modelGroupBox)
+        
+        #self.bottom_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         #left_layout.addItem(self.bottom_spacer)  
-        #               
+               
         main_layout.addWidget(self.splitter)
 
     def init_ui_nodeGroupBox(self):
         self.nodeGroupBox = self.create_external_group_box("Nodes",colors.get_color_hex("brightborder"))
+        self.init_node_lists()
         left_node_layout = QtWidgets.QVBoxLayout()
-        left_node_layout.addWidget(self.nodes_label)
-        left_node_layout.addWidget(self.input_nodes_group)
-        left_node_layout.addWidget(self.transform_nodes_group)
-        left_node_layout.addWidget(self.output_nodes_group)
+        custom_font = QtGui.QFont()
+        custom_font.setItalic(True)
+        self.nodes_label = self.create_label("To start, drag the nodes into the editor (to the right)",custom_font)                
+        left_node_layout.addWidget(self.nodes_label,1)
+        left_node_layout.addWidget(self.input_nodes_group,6)
+        left_node_layout.addWidget(self.transform_nodes_group,10)
+        left_node_layout.addWidget(self.output_nodes_group,6)
         self.nodeGroupBox.setLayout(left_node_layout)
 
     def init_ui_modelGroupBox(self):
         self.modelGroupBox = self.create_external_group_box("Selected Model",colors.get_color_hex("brightborder"))
+        custom_font = QtGui.QFont()
+        custom_font.setBold(True)
+        #self.connection_label = self.create_label("Selected LLM", custom_font)
+        #self.model_label = self.create_label("Selected Model", custom_font)
+        self.connectionText = self.create_text_edit()
+        self.modelText = self.create_text_edit()
         left_model_layout = QtWidgets.QVBoxLayout()        
         left_model_layout.addWidget(self.connectionText)
         left_model_layout.addWidget(self.modelText)
         self.modelGroupBox.setLayout(left_model_layout)
-        self.modelGroupBox.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.modelGroupBox.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
     def init_ui_ragGroupBox(self):
         self.ragGroupBox = self.create_external_group_box("RAG (Document Database)",colors.get_color_hex("brightborder"))
         rag_layout = QtWidgets.QVBoxLayout()
+        custom_font = QtGui.QFont()
+        custom_font.setItalic(True)
+        rag_info_label = self.create_label("Files added to the document database can be searched",custom_font)
+        rag_layout.addWidget(rag_info_label)
+
+      
+
+        rag_add_button = QtWidgets.QPushButton()
+        rag_add_button.setText("Add files to document database")
+        rag_add_button.setStyleSheet("QPushButton { font-weight: bold; }")
+        rag_add_button.clicked.connect(self.add_files_vectorDb)
+        rag_layout.addWidget(rag_add_button)
+
+        # rag_button = QtWidgets.QPushButton("Show Files List")
+        # rag_button.setStyleSheet("QPushButton { font-weight: bold; }")
+        # rag_button.clicked.connect(self.get_filelist_vectorDB)
+        # rag_layout.addWidget(rag_button)                
+
+        rag_refresh_button = QtWidgets.QPushButton()
+        rag_refresh_button.setText("Refresh document database")
+        rag_refresh_button.setStyleSheet("QPushButton { font-weight: bold; }")
+        rag_refresh_button.clicked.connect(self.update_vectorDB)
+        rag_layout.addWidget(rag_refresh_button)
+
+        #Adding no of files display
         rag_line_layout = QtWidgets.QHBoxLayout()
-        no_of_files_label = QtWidgets.QLabel("No of files indexed in RAG:")
+        no_of_files_label = QtWidgets.QLabel("No of files indexed in document database:")
         rag_line_layout.addWidget(no_of_files_label)
         self.rag_no_files_lineedit = QtWidgets.QLineEdit()
         self.rag_no_files_lineedit.setReadOnly(True)
         rag_line_layout.addWidget(self.rag_no_files_lineedit)
-        rag_layout.addLayout(rag_line_layout)        
-        rag_button = QtWidgets.QPushButton("Show Files List")
-        rag_button.setStyleSheet("QPushButton { font-weight: bold; }")
-        rag_button.clicked.connect(self.get_filelist_vectorDB)
-        rag_layout.addWidget(rag_button)
+        rag_layout.addLayout(rag_line_layout)  
+
+
         self.ragGroupBox.setLayout(rag_layout)        
-
-    def init_connection_widgets(self):
-        # Initialize connection text widgets with styles
-        self.connectionText = self.create_text_edit()
-        self.modelText = self.create_text_edit()
-
-    def init_labels(self):
-        # Initialize labels with styles
-        custom_font = QtGui.QFont()
-        custom_font.setBold(True)
-        self.connection_label = self.create_label("Selected LLM", custom_font)
-        self.model_label = self.create_label("Selected Model", custom_font)
-        custom_font = QtGui.QFont()
-        custom_font.setBold(False)
-        custom_font.setItalic(True)
-        self.nodes_label = self.create_label("Drag and drop below nodes", custom_font)
-        self.bottom_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
 
     def init_node_lists(self):
@@ -182,9 +200,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_nodes_group = self.create_group_box("Output Nodes", self.output_node_list, colors.get_color_hex("output"))
 
 
-    def create_label(self, text, font, color=None):
+    def create_label(self, text, font = "", color=None):
         label = QtWidgets.QLabel(text)
-        label.setFont(font)
+        if not(font==""):
+            label.setFont(font)
         label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         if color:
             label.setStyleSheet(f"""
@@ -272,7 +291,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load_initial_project(self):
         load_project_path = (Path(__file__).parent.resolve())
-        self.load_project(load_project_path)
+        self.load_project_classes(load_project_path)
 
     def restore_last_state(self):
         if self.settings.contains("geometry"):
@@ -298,23 +317,23 @@ class MainWindow(QtWidgets.QMainWindow):
         if file_path:
             self.node_widget.save_project(file_path)
 
-    def load_project(self,project_path=None):
+    def load_project_classes(self,project_path=None):
         # Preloaded classes
         self.imports = {}
         self.input_imports = {}
         self.transform_imports = {}
         self.output_imports = {}
-        self.input_imports['SimpleInput_Node'] = {"class": SimpleInput_Node, "module": SimpleInput_Node.__module__,"image":'textinput'}
-        self.input_imports['Input_Node'] = {"class": Input_Node, "module": Input_Node.__module__,"image":'assistant'}
-        self.input_imports['FileExtract_Node'] = {"class": FileExtract_Node, "module": FileExtract_Node.__module__,"image":'fileextract'}
-        self.transform_imports['SimpleTransform_Node'] = {"class": SimpleTransform_Node, "module": SimpleTransform_Node.__module__,"image":'simpletransform'}        
-        self.transform_imports['Combine_Node'] = {"class": Combine_Node, "module": Combine_Node.__module__,"image":'combine'}
-        self.transform_imports['TransformLLM_Node'] = {"class": TransformLLM_Node, "module": TransformLLM_Node.__module__,"image":'assistant'}
-        self.transform_imports['Aggregate_Node'] = {"class": Aggregate_Node, "module": Aggregate_Node.__module__,"image":'aggregate'}
-        self.transform_imports['Test_Node'] = {"class": Test_Node, "module": Test_Node.__module__,"image":'assistant'}
-        self.output_imports['ExcelAdvancedProcess_Node'] = {"class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__,"image":'excel'}
-        self.output_imports['PowerPointAdvanced_Node'] = {"class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__,"image":'powerpoint'}
-        self.output_imports['OutputViewer_Node'] = {"class": OutputViewer_Node, "module": OutputViewer_Node.__module__,"image":'outputviewer'}
+        self.input_imports['TextInput_Node'] = {"label":"Text Input","class": TextInput_Node, "module": TextInput_Node.__module__,"image":'textinput'}
+        self.input_imports['AIPrompt_Node'] = {"label":"AI Prompt","class": AIPrompt_Node, "module": AIPrompt_Node.__module__,"image":'assistant'}
+        self.input_imports['FileExtract_Node'] = {"label":"Extract File","class": FileExtract_Node, "module": FileExtract_Node.__module__,"image":'fileextract'}
+        self.transform_imports['TextEdit_Node'] = {"label":"Edit Text","class": TextEdit_Node, "module": TextEdit_Node.__module__,"image":'simpletransform'}        
+        self.transform_imports['Combine_Node'] = {"label":"Combine Text","class": Combine_Node, "module": Combine_Node.__module__,"image":'combine'}
+        self.transform_imports['AI_Prompt_Input_Node'] = {"label":"AI Prompt (with input)","class": AI_Prompt_Input_Node, "module": AI_Prompt_Input_Node.__module__,"image":'assistant'}
+        self.transform_imports['Aggregate_Node'] = {"label":"AI Prompt (mutiple inputs)","class": Aggregate_Node, "module": Aggregate_Node.__module__,"image":'aggregate'}
+        self.transform_imports['Test_Node'] = {"label":"Chat with AI","class": Test_Node, "module": Test_Node.__module__,"image":'assistant'}
+        self.output_imports['ExcelAdvancedProcess_Node'] = {"label":"Excel Interface","class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__,"image":'excel'}
+        self.output_imports['PowerPointAdvanced_Node'] = {"label":"PowerPoint Interface","class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__,"image":'powerpoint'}
+        self.output_imports['OutputViewer_Node'] = {"label":"View Output","class": OutputViewer_Node, "module": OutputViewer_Node.__module__,"image":'outputviewer'}
 
         # Update project with the preloaded classes
         self.input_node_list.update_project(self.input_imports)
@@ -347,7 +366,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.node_widget.load_scene(json_path, self.imports)
             break
 
-    def get_project_path(self):
+    def load_project(self):
         json_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             None, "Select JSON File", "", "JSON Files (*.json)"
         )
@@ -361,6 +380,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.set_rag_no_files_lineedit(noOfFiles)
         Display.show_message_box( "Success", "Document database refreshed\n " + str(response))
 
+    
+    def add_files_vectorDb(self):
+        # Open the dialog to select multiple files
+        file_dialog = QtWidgets.QFileDialog()
+        file_dialog.setFileMode(QtWidgets.QFileDialog.ExistingFiles)  
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+
+            # Get the destination folder (Documents)
+            documents_folder = directory.check_documents_directory()
+
+            # Copy the selected files to the Documents folder
+            for file_path in selected_files:
+                try:
+                    shutil.copy2(file_path, documents_folder)  # copy2 preserves metadata
+                except Exception as e:
+                    # Handle potential errors (e.g., file already exists, permissions)
+                    QtWidgets.QMessageBox.critical(None, "Error", f"Failed to copy {file_path}: {e}")
+        self.update_vectorDB()
+        
+    def open_document_directory(self):
+        directory.open_document_directory()
 
     def get_filelist_vectorDB(self):
         vDB = VectorDB()

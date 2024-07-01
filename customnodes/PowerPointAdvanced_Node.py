@@ -11,8 +11,8 @@ from utils.llmconnection import LLMConnection
 from pptx.util import Inches
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 import win32com.client
-import pandas as pd
 import json
 
 
@@ -21,6 +21,7 @@ class PowerPointAdvanced_Node(Node):
         super().__init__()
         self.title_text = "PowerPoint Interface"
         self.type_text = "PowerPoint Interface"
+        self.icon_file_path = directory.get_icon_path("powerpoint") #make sure to place the icon in resources/node_icons        
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("output"))
         self.pin_output = self.add_pin(name="value", is_output=True)

@@ -8,30 +8,30 @@ from utils.llmconnection import LLMConnection
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import json
 import utils.themecolors as colors
+import utils.directory as directory
 
 
-class TransformLLM_Node(Node):
+class AI_Prompt_Input_Node(Node):
     def __init__(self,node_config = {}):
         super().__init__()
 
-        self.title_text = "GenAI Transform"
-        self.type_text = "GenAI Transform"
+        self.title_text = "AI Assistant"
+        self.type_text = "AI Prompt with I/P"
+        self.icon_file_path = directory.get_icon_path("simpletransform") #make sure to place the icon in resources/node_icons        
         self.description = "Enter Description"
-        self.set_color(title_color=(44, 110, 96))
+        self.set_color(colors.get_color_rgb('transform'))
         self.pin_A = self.add_pin(name="input A", is_output=False)
         self.pin_output = self.add_pin(name="output", is_output=True)
         self.build(node_config)
 
 
     def init_widget(self, node_config):
-        self.config = node_config              
+        super().init_widget(node_config)               
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(200)
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        self.input1text = QTextEdit()
-        if self.pin_A:
-            self.input1text.setPlainText(self.config["input1"])
+        self.input1text = QTextEdit(self.config['input1'])
         self.input1text.setFixedHeight(50)
         self.input1text.setStyleSheet("""
         QTextEdit{
@@ -43,7 +43,7 @@ class TransformLLM_Node(Node):
         self.textbox = QTextEdit()
         self.textbox.setFixedHeight(50)
         self.responsetext = QTextEdit()
-        self.responsetext.setPlainText(self.config["output"])
+        self.responsetext.setPlainText(self.config['output'])
         self.responsetext.setFixedHeight(50)
         self.responsetext.setStyleSheet("""
         QTextEdit{

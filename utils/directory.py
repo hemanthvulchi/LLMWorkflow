@@ -6,6 +6,13 @@ def get_current_directory():
 def get_db_filepath(persist_directory):
     return os.path.join(persist_directory, "chroma.sqlite3") 
 
+def open_document_directory():
+    directory_path = check_directory('Documents')
+    os.startfile(directory_path)
+
+def check_documents_directory():
+    return check_directory('documents')
+
 def get_icon_path(file_name):
     complete_file_name = file_name + ".svg"
     current_directory = os.path.join(get_current_directory(), "resources\\node_icons")

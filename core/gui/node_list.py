@@ -16,9 +16,9 @@ class NodeList(QtWidgets.QListWidget):
         # make an item for each custom  class
 
         for name, data in imports.items():
-            name = name.replace("_Node", "")
+            #name = name.replace("_Node", "")
 
-            item = QtWidgets.QListWidgetItem(name)
+            item = QtWidgets.QListWidgetItem(data["label"])
             item.module = data["module"]
             item.class_name = data["class"]
             icon_path = directory.get_icon_path(data["image"])

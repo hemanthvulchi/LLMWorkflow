@@ -3,13 +3,15 @@ from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from core.node import Node
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 
 class OutputViewer_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "Output Viewer"
-        self.type_text = "Output Viewer"
+        self.title_text = "View Output"
+        self.type_text = "View Output"
+        self.icon_file_path = directory.get_icon_path("outputviewer") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("output"))
 

@@ -7,6 +7,7 @@ from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import utils.themecolors as colors
+import utils.directory as directory
 import json
 
 
@@ -14,8 +15,9 @@ class Aggregate_Node(Node):
     def __init__(self,node_config = {}):
         super().__init__()
 
-        self.title_text = "GenAI Aggregate"
-        self.type_text = "GenAI Aggregate"
+        self.title_text = "AI Prompt"
+        self.type_text = "AI Prompt"
+        self.icon_file_path = directory.get_icon_path("merge")
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         #self.ex_in_pin=self.add_pin(name="Ex In", is_output=False, execution=True)

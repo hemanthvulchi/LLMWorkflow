@@ -5,14 +5,16 @@ from core.node import Node
 import utils.documents.fileextract as fex
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 import os
 
 class FileExtract_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "FileExtract"
-        self.type_text = "FileExtract"
+        self.title_text = "Extract File"
+        self.type_text = "Extract File"
+        self.icon_file_path = directory.get_icon_path("fileextract") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)

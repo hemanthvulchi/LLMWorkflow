@@ -27,21 +27,21 @@
 # }
 
 #other editors
-colors = {
-    'output': '#33954F',
-    'transform': '#CB7301',
-    #'transform': '#c04000',  
-    'transform2': '#A76FFF',  
-    'input': '#0184D5',
-    'primary':'#2683C6',
-    'danger': '#C1292E',
-    'maize': '#F7EF81',
-    'info': '#17a2b8',
-    'light': '#f8f9fa',
-    'dark': '#343a40',
-    'border': '#646464',  
-    'brightborder': '#dedede'
-}
+# colors = {
+#     'output': '#33954F',
+#     'transform': '#CB7301',
+#     #'transform': '#c04000',  
+#     #'transform2': '#A76FFF',  
+#     'input': '#0184D5',
+#     'primary':'#2683C6',
+#     'danger': '#C1292E',
+#     'maize': '#F7EF81',
+#     'info': '#17a2b8',
+#     'light': '#f8f9fa',
+#     'dark': '#343a40',
+#     'border': '#646464',  
+#     'brightborder': '#dedede'
+# }
 
 #google gemini recommendation
 # colors = {
@@ -59,7 +59,20 @@ colors = {
 #     'brightborder': '#dedede'
 # }
 
-
+#another attempt
+colors = {
+    'output': '#3B6200',
+    'transform': '#005B60',
+    'input': '#005595',
+    'primary':'#2683C6',
+    'danger': '#C1292E',
+    'maize': '#F7EF81',
+    'info': '#17a2b8',
+    'light': '#f8f9fa',
+    'dark': '#343a40',
+    'border': '#646464',  
+    'brightborder': '#dedede'
+}
 def get_color_hex(color_name):
     return colors.get(color_name, None)
 

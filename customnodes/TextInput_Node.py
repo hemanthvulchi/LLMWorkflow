@@ -4,14 +4,16 @@ from core.common import Node_Status
 from core.node import Node
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 
 
-class SimpleInput_Node(Node):
+class TextInput_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "Simple Input"
-        self.type_text = "Simple Input"
+        self.title_text = "Text Input"
+        self.type_text = "Text Input"
+        self.icon_file_path = directory.get_icon_path("textinput") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)

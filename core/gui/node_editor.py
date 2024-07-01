@@ -107,9 +107,6 @@ class NodeEditor(QtCore.QObject):
 
             elif event.button() == QtCore.Qt.RightButton:
                 item = self.item_at(event.scenePos())
-                print("QtCore.Qt.RightButton")
-                print("item:",item)
-                print("event pos:",event.scenePos())                
                 if isinstance(item, Node):
                     item.on_right_click(event.scenePos())
                     return True
@@ -170,7 +167,7 @@ class NodeEditor(QtCore.QObject):
                 if node_title_pos > click_relative_height:
                     item.topbar_doubleclick()
                 else:
-                    print("Clicked on bottom")
+                    print("Double clicked on bottom of widget|funtionality to be determined")
                 return True
 
         return super().eventFilter(watched, event)

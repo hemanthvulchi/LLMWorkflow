@@ -8,15 +8,17 @@ from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 from core.common import Node_Status
 from utils.llmconnection import LLMConnection
 import utils.themecolors as colors
+import utils.directory as directory
 import json
 
 # Set your OpenAI API key here
-class Input_Node(Node):
+class AIPrompt_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
-        self.title_text = "GenAI Input"
-        self.type_text = "GenAI Input"
+        self.title_text = "AI Prompt"
+        self.type_text = "AI Prompt"
         self.description = "Enter Description"
+        self.icon_file_path = directory.get_icon_path("assistant") #make sure to place the icon in resources/node_icons
         self.set_color(colors.get_color_rgb("input"))
         self.pin_output = self.add_pin(name="value", is_output=True)
         self.build(node_config)

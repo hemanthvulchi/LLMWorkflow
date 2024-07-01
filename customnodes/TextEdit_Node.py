@@ -4,14 +4,16 @@ from core.common import Node_Status
 from core.node import Node
 from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
 import utils.themecolors as colors
+import utils.directory as directory
 
 
-class SimpleTransform_Node(Node):
+class TextEdit_Node(Node):
     def __init__(self, node_config = {}):
         super().__init__()
 
-        self.title_text = "Simple Transform"
-        self.type_text = "Simple Transform"
+        self.title_text = "Text Edit"
+        self.type_text = "Text Edit"
+        self.icon_file_path = directory.get_icon_path("simpletransform") #make sure to place the icon in resources/node_icons
         self.description = "Enter Description"
         self.set_color(colors.get_color_rgb("transform"))
         self.pin_A = self.add_pin(name="input", is_output=False)
@@ -20,7 +22,6 @@ class SimpleTransform_Node(Node):
 
     def init_widget(self, node_config):  
         super().init_widget(node_config)        
-                         
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
