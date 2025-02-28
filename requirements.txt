@@ -10,4 +10,5 @@ python-pptx
 python-docx
 pypdf
 chromadb
+ollama
 

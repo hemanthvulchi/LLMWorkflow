@@ -1,0 +1,2 @@
+standard SD8792: Logging controls should use QRadar for 
+standard SD983-34: Logging controls should send everything SumoLogic for retention

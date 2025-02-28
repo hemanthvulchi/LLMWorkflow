@@ -56,7 +56,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         self.node_color = QtGui.QColor(background_color[0], background_color[1], background_color[2])
         self.icon_bg_color = QtGui.QColor(50, 50, 50)
 
-    def draw_glow(self, painter, path, color, blur_radius=15):
+    def draw_border(self, painter, path, color, blur_radius=15):
         """Draws a glow effect around the given path."""
         for i in range(blur_radius, 10, -1):
             alpha = 255 - (i / blur_radius) * 255
@@ -82,7 +82,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         painter.drawPath(self.icon_path)
         # glow is being to distracting, to retry later
-        # glow_color = self.get_status_color()
+        glow_color = self.get_status_color()
         # self.draw_glow(painter, self.path, glow_color)
         gradient = QtGui.QLinearGradient()
         gradient.setStart(0, -90)
@@ -141,9 +141,9 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         total_width = self.widget.size().width()
         self.path = QtGui.QPainterPath()  # The main path
         # The fonts that will be used
-        title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=12)
-        title_type_font = QtGui.QFont("Lucida Sans Unicode", pointSize=8)
-        pin_font = QtGui.QFont("Lucida Sans Unicode")
+        title_font = QtGui.QFont("Segoe UI", pointSize=11)
+        title_type_font = QtGui.QFont("Segoe UI", pointSize=9)
+        pin_font = QtGui.QFont("Segoe UI")
 
         # Get the dimensions of the title and type
         title_dim = {
@@ -204,7 +204,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         # Draw the title
         self.title_path.addText(
-            -total_width / 2 + 35,
+            -total_width / 2 + 40,
             (-total_height / 2) + title_dim["h"] / 2 + 5,
             title_font,
             self.title_text,
@@ -212,8 +212,8 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         # Draw the type
         self.type_path.addText(
-            -total_width / 2 + 35,
-            (-total_height / 2) + title_dim["h"] + 5,
+            -total_width / 2 + 40,
+            (-total_height / 2) + title_dim["h"] + 10,
             title_type_font,
             f"{self.type_text}",
         )

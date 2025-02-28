@@ -40,6 +40,7 @@ from customnodes.TextEdit_Node import TextEdit_Node
 from customnodes.FileExtract_Node import FileExtract_Node
 from customnodes.AIPromptInput_Node import AI_Prompt_Input_Node
 from customnodes.Test_Node import Test_Node
+from customnodes.AI_Prompt_v2 import AIPrompt_Node2
 import utils.themecolors as colors
 import utils.directory as directory
 
@@ -80,9 +81,24 @@ class MainWindow(QtWidgets.QMainWindow):
         reference_menu = QtWidgets.QMenu("Reference Files (RAG)", self)
         self.menuBar().addMenu(reference_menu)
         
-        updateDB_action = QtGui.QAction("Update Database", self)
-        updateDB_action.triggered.connect(self.update_vectorDB)
-        reference_menu.addAction(updateDB_action)
+        refreshDB_action = QtGui.QAction("Refresh Database", self)
+        refreshDB_action.triggered.connect(self.update_vectorDB)
+        reference_menu.addAction(refreshDB_action)
+
+        listFilesDB_action = QtGui.QAction("List files", self)
+        listFilesDB_action.triggered.connect(self.get_filelist_vectorDB)
+        reference_menu.addAction(listFilesDB_action)
+
+        addFilesDB_action = QtGui.QAction("Add files to database", self)
+        addFilesDB_action.triggered.connect(self.add_files_vectorDb)
+        reference_menu.addAction(addFilesDB_action)
+
+        about_menu = QtWidgets.QMenu("About tool", self)
+        self.menuBar().addMenu(about_menu)
+        
+        showAbout_action = QtGui.QAction("About", self)
+        showAbout_action.triggered.connect(self.show_about_tool)
+        about_menu.addAction(showAbout_action)
 
     def init_ui(self):
         # Create main layout
@@ -155,7 +171,7 @@ class MainWindow(QtWidgets.QMainWindow):
       
 
         rag_add_button = QtWidgets.QPushButton()
-        rag_add_button.setText("Add files to document database")
+        rag_add_button.setText("Add files and update document database")
         rag_add_button.setStyleSheet("QPushButton { font-weight: bold; }")
         rag_add_button.clicked.connect(self.add_files_vectorDb)
         rag_layout.addWidget(rag_add_button)
@@ -272,7 +288,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 margin-top: 5px;
             }}
             QGroupBox::title {{
-                color: {color};
+                color: white;
                 subcontrol-origin: margin;
                 subcontrol-position: top left; 
                 padding: 0 3px;
@@ -325,15 +341,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_imports = {}
         self.input_imports['TextInput_Node'] = {"label":"Text Input","class": TextInput_Node, "module": TextInput_Node.__module__,"image":'textinput'}
         self.input_imports['AIPrompt_Node'] = {"label":"AI Prompt","class": AIPrompt_Node, "module": AIPrompt_Node.__module__,"image":'assistant'}
+        self.input_imports['AIPrompt_Node2'] = {"label":"AI Prompt2","class": AIPrompt_Node2, "module": AIPrompt_Node2.__module__,"image":'assistant'}
         self.input_imports['FileExtract_Node'] = {"label":"Extract File","class": FileExtract_Node, "module": FileExtract_Node.__module__,"image":'fileextract'}
         self.transform_imports['TextEdit_Node'] = {"label":"Edit Text","class": TextEdit_Node, "module": TextEdit_Node.__module__,"image":'simpletransform'}        
         self.transform_imports['Combine_Node'] = {"label":"Combine Text","class": Combine_Node, "module": Combine_Node.__module__,"image":'combine'}
         self.transform_imports['AI_Prompt_Input_Node'] = {"label":"AI Prompt (with input)","class": AI_Prompt_Input_Node, "module": AI_Prompt_Input_Node.__module__,"image":'assistant'}
-        self.transform_imports['Aggregate_Node'] = {"label":"AI Prompt (mutiple inputs)","class": Aggregate_Node, "module": Aggregate_Node.__module__,"image":'aggregate'}
-        self.transform_imports['Test_Node'] = {"label":"Chat with AI","class": Test_Node, "module": Test_Node.__module__,"image":'assistant'}
+        self.transform_imports['Aggregate_Node'] = {"label":"AI Prompt (mutiple inputs)","class": Aggregate_Node, "module": Aggregate_Node.__module__,"image":'merge'}
         self.output_imports['ExcelAdvancedProcess_Node'] = {"label":"Excel Interface","class": ExcelAdvancedProcess_Node, "module": ExcelAdvancedProcess_Node.__module__,"image":'excel'}
         self.output_imports['PowerPointAdvanced_Node'] = {"label":"PowerPoint Interface","class": PowerPointAdvanced_Node, "module": PowerPointAdvanced_Node.__module__,"image":'powerpoint'}
         self.output_imports['OutputViewer_Node'] = {"label":"View Output","class": OutputViewer_Node, "module": OutputViewer_Node.__module__,"image":'outputviewer'}
+        self.output_imports['Test_Node'] = {"label":"Chat with AI","class": Test_Node, "module": Test_Node.__module__,"image":'assistant'}        
 
         # Update project with the preloaded classes
         self.input_node_list.update_project(self.input_imports)
@@ -398,7 +415,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                     # Handle potential errors (e.g., file already exists, permissions)
                     QtWidgets.QMessageBox.critical(None, "Error", f"Failed to copy {file_path}: {e}")
-        self.update_vectorDB()
+            self.update_vectorDB()
+        
         
     def open_document_directory(self):
         directory.open_document_directory()
@@ -407,6 +425,12 @@ class MainWindow(QtWidgets.QMainWindow):
         vDB = VectorDB()
         file_list = vDB.get_filelist_db()
         Display.show_message_box("Files in RAG","List of files currently indexed and that can be searched:\n " + str(file_list))
+
+    def show_about_tool(self):
+        Display.show_message_box(f"Visual Prompt Engineering","This is a conceptual prototype built to assist practitioners in "
+                                 "automating business tasks by tactically structuring data for easy processing by AI. "
+                                 "It provides an embedded interface with office documents like PowerPoint and Excel."
+                                 "\n\nVersion: Ahhhhhhhhhhhhhhhhh :@")
 
     def set_rag_no_files_lineedit(self,noOfFiles):
         self.rag_no_files_lineedit.setText(str(noOfFiles))

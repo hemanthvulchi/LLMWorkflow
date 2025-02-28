@@ -18,7 +18,7 @@ class SelectedLLM:
 
 class ModelSelection:
     def __init__(self):
-        self.llm_companies = ["OpenAI GPTs", "Google Gemini"]  
+        self.llm_companies = ["OpenAI GPTs", "Google Gemini","Meta","DeepSeek"]  
 
         self.llm_models = {
             "OpenAI GPTs": [
@@ -31,7 +31,15 @@ class ModelSelection:
                 ("Gemini 1.5 Pro(1M): $3.50-7.00 & $10.50-21.10", "gemini-1.5-pro", "1048576"),
                 ("Gemini 1.5 Flash(1M): $0.35-0.70 & $1.05-2.10", "gemini-1.5-flash", "1048576"),
                 ("Gemini 1.0 Pro(32K): $0.50 & $1.50", "gemini-1.0-pro", "32000")
-            ]
+            ],
+            "Meta": [
+                ("Llama 3.2 2.0 GB: Local", "llama3.2", "8096"),
+                ("Llama 3.2 43.0 GB: Local", "llama3.3", "8096")
+
+            ],
+            "DeepSeek": [
+                ("DeepSeek-R1 4.7 GB: Local", "deepseek-r1", "64000")
+            ]            
         }
         self.settings = ""
         self.settings = QtCore.QSettings("node-editorDisplay", "NodeEditorDisplay")

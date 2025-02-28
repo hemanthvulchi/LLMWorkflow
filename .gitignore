@@ -23,7 +23,8 @@ db/
 .env
 .venv
 env/
-
+# documents
+documents/
 
 # playground and test
 playground/

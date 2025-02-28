@@ -1,0 +1,106 @@
+
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QTextEdit
+from PySide6.QtCore import Qt
+from core.node import Node
+#from customnodes.common_widgets.ConfigDialog import ConfigDialog
+from customnodes.common_widgets.PromptDialog import PromptDialog
+from customnodes.common_widgets.PropertiesDialog import PropertiesDialog
+from core.common import Node_Status
+from utils.llmconnection import LLMConnection
+import utils.themecolors as colors
+import utils.directory as directory
+import json
+
+# Set your OpenAI API key here
+class AIPrompt_Node2(Node):
+    def __init__(self, node_config = {}):
+        super().__init__()
+        self.title_text = "AI Prompt2"
+        self.type_text = "AI Prompt2"
+        self.description = "Enter Description"
+        self.icon_file_path = directory.get_icon_path("assistant") #make sure to place the icon in resources/node_icons
+        self.set_color(colors.get_color_rgb("input"))
+        self.pin_output = self.add_pin(name="value", is_output=True)
+        self.build(node_config)
+
+
+    def init_widget(self, node_config):
+        super().init_widget(node_config)        
+        self.widget = QtWidgets.QWidget()
+        self.widget.setFixedWidth(200)
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.textbox = QTextEdit()
+        self.textbox.setPlainText(self.config["user_prompt"])
+        self.textbox.setFixedHeight(50)
+        self.responsetext = QTextEdit()
+        self.responsetext.setPlainText(self.config["output"])
+        self.responsetext.setFixedHeight(50)
+        self.responsetext.setStyleSheet("""
+        QTextEdit{
+        background: rgb(50, 50, 50); /*background color */
+        }
+        """)
+        self.responsetext.setReadOnly(True)
+
+        self.btn = QtWidgets.QPushButton("Run")
+        self.btn.clicked.connect(self.btn_chat)
+
+        self.config_btn = QtWidgets.QPushButton("Configure")
+        self.config_btn.clicked.connect(self.show_configuration)
+
+        layout.addWidget(self.textbox)
+        layout.addWidget(self.responsetext)
+        layout.addWidget(self.btn)
+        layout.addWidget(self.config_btn)
+        self.widget.setLayout(layout)
+
+        proxy = QtWidgets.QGraphicsProxyWidget()
+        proxy.setWidget(self.widget)
+        proxy.setParentItem(self)
+        self.setOuput()
+
+    def setOuput(self):
+        self.pin_output.set_data(self.config["output"])
+
+    def show_configuration(self):
+        self.config["user_prompt"] = self.textbox.toPlainText()
+        config_json = json.dumps(self.config)
+        main_window = QtWidgets.QMainWindow()
+        self.dialog = ExtendedConfigDialog(config_json, main_window)
+        #self.dialog.setWindowFlags(self.dialog.windowFlags() | Qt.WindowStaysOnTopHint)
+        if self.dialog.exec():
+            self.config = json.loads(self.dialog.get_configuration())
+            self.responsetext.setText(self.config["output"])
+            self.textbox.setText(self.config["user_prompt"])
+            self.pin_output.set_data(self.responsetext.toPlainText())
+            if self.pin_output.get_data() != "":
+                self.status = Node_Status.CLEAN            
+        print("Pin output data:", self.pin_output.get_data())
+
+
+    def btn_chat(self):
+        connection = LLMConnection()
+        response = connection.call_prompt(self.textbox.toPlainText(),self.config["system_prompt"])
+        self.status = Node_Status.CLEAN  
+        self.responsetext.setText(str(response))
+        self.pin_output.set_data(self.responsetext.toPlainText())
+
+    def topbar_doubleclick(self):
+        dialog = PropertiesDialog(self.title_text, self.description)        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.title_text, self.description = dialog.get_values()
+        self.config["title_text"] = self.title_text
+        self.config["description"] = self.description
+        self.build(self.config)
+
+
+
+class ExtendedConfigDialog(PromptDialog):
+    def __init__(self, config_json, parent=None):
+        super(ExtendedConfigDialog, self).__init__(config_json, parent)
+        self.setmainlayout()
+        self.setLayout(self.main_layout)
+        self.post_prompt.setVisible(False)
+        self.complete_prompt.setVisible(False)
