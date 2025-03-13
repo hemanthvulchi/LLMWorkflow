@@ -22,7 +22,7 @@ The engine is composed of three components, the node editor interface, LLM API c
 Need to add better error handling functions, dynamic workflow and a whole list of features
 
 **References:**
-The node editor is based on a [project](https://github.com/bhowiebkr/python-node-editor) by bhowiebkr
+The node editor interface is a heavily modified version of [project](https://github.com/bhowiebkr/python-node-editor) by bhowiebkr
 
 I added GNU lesser general public license since the underlying PySide6 itself is under a similar license. 
 
