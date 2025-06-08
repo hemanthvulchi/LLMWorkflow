@@ -24,8 +24,6 @@ Need to add better error handling functions, dynamic workflow and a whole list o
 **References:**
 The node editor interface is a heavily modified version of [project](https://github.com/bhowiebkr/python-node-editor) by bhowiebkr
 
-I added GNU lesser general public license since the underlying PySide6 itself is under a similar license. 
-
 Tool is mainly to demonstrate the art of the possible
 
 "# GenAI" 
