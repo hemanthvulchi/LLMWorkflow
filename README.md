@@ -18,7 +18,8 @@ The engine is composed of three components, the node editor interface, LLM API c
    d) GenAI Aggregate: allows you to combine data and also have it processed at the same time
    e) Excel Assistant: allows you to take data from previous nodes for context and then extract questions from the Excel and to answer them directly in the Excel
    f) PowerPoint Assistant: allows you to take data from previous nodes for context and then extract questions from the PowerPoint and to answer them directly in the PowerPoint
-
+4) There is also an integrated RAG in the tool using an ChromaDB.
+5) The whole thing can be deployed as an exe file.
 Need to add better error handling functions, dynamic workflow and a whole list of features
 
 **References:**
